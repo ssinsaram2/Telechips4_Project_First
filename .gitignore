@@ -1,0 +1,21 @@
+# 1. 모든 가상환경 폴더 통째로  무시
+venv/
+insight_env/
+.direnv/
+
+# 2. 파이썬이 자동으로 생성하는 캐시 파일 무시
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# 3. 인공지능 모델 파일 가중치 (혹시 모를 대용량 대비)
+*.pt
+*.onnx
+*.tflite
+*.bin
+*.param
+
+# 4. 체크포인트 및 로그 폴더 무시
+.ipynb_checkpoints/
+logs/
