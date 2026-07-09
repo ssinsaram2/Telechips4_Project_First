@@ -2,6 +2,8 @@
 venv/
 insight_env/
 .direnv/
+**/venv/
+**/.venv/
 
 # 2. 파이썬이 자동으로 생성하는 캐시 파일 무시
 __pycache__/
@@ -19,3 +21,8 @@ __pycache__/
 # 4. 체크포인트 및 로그 폴더 무시
 .ipynb_checkpoints/
 logs/
+
+# 데이터 셋 무시
+**/dataset/
+*.jpg
+*.png

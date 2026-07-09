@@ -6,7 +6,7 @@ app = FaceAnalysis(providers=['CPUExecutionProvider'])
 app.prepare(ctx_id=0, det_size=(640, 640))
 
 # 2. 실제 이미지 로드 (폴더 안에 face.jpg가 있어야 합니다)
-img = cv2.imread("HHJ.jpg")
+img = cv2.imread("SJH.jpg")
 
 # 3. 얼굴 분석 수행
 faces = app.get(img)
