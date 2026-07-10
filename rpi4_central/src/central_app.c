@@ -817,16 +817,33 @@ static void start_child_alarm_level2(const char *reason)
 
 static void clear_child_alarm(void)
 {
+    if (!g_childAlarmLatched)
+    {
+        printf("[central] ignore stale child alarm clear: state=%d\n", (int)g_state);
+        fflush(stdout);
+        return;
+    }
+
     g_childAlarmLatched = false;
     g_childLevel2Sent = false;
     g_pirDetected = false;
     g_cameraDetected = false;
-    send_ignition_operation(IGNITION_OFF, OP_PARKING);
+
+    if (g_state == STATE_IGNITION_OFF)
+    {
+        send_ignition_operation(IGNITION_OFF, OP_PARKING);
+        send_ui(IPC_MSG_SCREEN_OFF, 0, 0, 0, 0);
+    }
+    else
+    {
+        printf("[central] child alarm clear without screen-off: state=%d\n", (int)g_state);
+        fflush(stdout);
+    }
+
     can_send_onoff(CAN_ID_EXT_LED_CONTROL, false);
     send_window_target(0U);
     send_object_detected(false, 0U);
     update_buzzer();
-    send_ui(IPC_MSG_SCREEN_OFF, 0, 0, 0, 0);
     printf("[central] child alarm cleared by UI\n");
 }
 
