@@ -6,6 +6,8 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 
+
+
 namespace {
 
 QString stateStyle(const QString &state)

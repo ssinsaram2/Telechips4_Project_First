@@ -25,17 +25,16 @@ FaceAuthScreen::FaceAuthScreen(QWidget *parent)
     m_statusLabel = makeLabel(QStringLiteral("카메라를 바라봐 주세요"), 24);
     layout->addWidget(m_statusLabel);
 
-    QHBoxLayout *testRow = new QHBoxLayout;
-    QPushButton *successButton = makeButton(QStringLiteral("테스트: 등록자 1"));
-    QPushButton *failButton = makeButton(QStringLiteral("테스트: 미등록"));
-    connect(successButton, &QPushButton::clicked, this, [this]() {
-        emit faceSuccessTestRequested(1);
-    });
-    connect(failButton, &QPushButton::clicked, this, &FaceAuthScreen::faceFailTestRequested);
-    testRow->addWidget(successButton);
-    testRow->addWidget(failButton);
-    layout->addLayout(testRow);
+    // === 수정한 부분 ===
+    m_pinEntryButton = makeButton(QStringLiteral("PIN 입력"));
+    m_pinEntryButton->setVisible(false);
+    connect(m_pinEntryButton, &QPushButton::clicked, this, &FaceAuthScreen::pinEntryRequested);
+    layout->addWidget(m_pinEntryButton);
+    // === 수정한 부분 ===
 
+    QHBoxLayout *testRow = new QHBoxLayout;
+
+    layout->addLayout(testRow);
     layout->addStretch();
 }
 
@@ -43,18 +42,32 @@ void FaceAuthScreen::resetStatus()
 {
     if (m_statusLabel)
         m_statusLabel->setText(QStringLiteral("카메라를 바라봐 주세요"));
+    if (m_pinEntryButton)
+        m_pinEntryButton->setVisible(false);
 }
 
 void FaceAuthScreen::showDriverRecognized(int driverId)
 {
     if (m_statusLabel)
         m_statusLabel->setText(QStringLiteral("등록 운전자 인식: %1").arg(driverId));
+    if (m_pinEntryButton)
+        m_pinEntryButton->setVisible(false);
 }
 
 void FaceAuthScreen::showUnknownDriver()
 {
     if (m_statusLabel)
         m_statusLabel->setText(QStringLiteral("미등록자입니다. PIN 화면으로 전환합니다."));
+    if (m_pinEntryButton)
+        m_pinEntryButton->setVisible(false);
+}
+
+void FaceAuthScreen::showPinEntryPrompt()
+{
+    if (m_statusLabel)
+        m_statusLabel->setText(QStringLiteral("얼굴 인식 시간이 초과되었습니다. PIN 입력을 선택하세요."));
+    if (m_pinEntryButton)
+        m_pinEntryButton->setVisible(true);
 }
 
 QLabel *FaceAuthScreen::makeLabel(const QString &text, int pointSize, bool bold)

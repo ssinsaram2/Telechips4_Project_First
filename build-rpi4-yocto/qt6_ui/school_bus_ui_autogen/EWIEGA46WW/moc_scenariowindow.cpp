@@ -83,6 +83,8 @@ template <> constexpr inline auto ScenarioWindow::qt_create_metaobjectdata<qt_me
         "handleFaceResultSuccess",
         "handleFaceResultFail",
         "submitPin",
+        "erasePinDigit",
+        "handleAuthTimeout",
         "resetToPureBlack"
     };
 
@@ -151,8 +153,12 @@ template <> constexpr inline auto ScenarioWindow::qt_create_metaobjectdata<qt_me
         QtMocHelpers::SlotData<void()>(43, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'submitPin'
         QtMocHelpers::SlotData<void()>(44, 2, QMC::AccessPrivate, QMetaType::Void),
-        // Slot 'resetToPureBlack'
+        // Slot 'erasePinDigit'
         QtMocHelpers::SlotData<void()>(45, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'handleAuthTimeout'
+        QtMocHelpers::SlotData<void()>(46, 2, QMC::AccessPrivate, QMetaType::Void),
+        // Slot 'resetToPureBlack'
+        QtMocHelpers::SlotData<void()>(47, 2, QMC::AccessPrivate, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -197,7 +203,9 @@ void ScenarioWindow::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         case 18: _t->handleFaceResultSuccess((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         case 19: _t->handleFaceResultFail(); break;
         case 20: _t->submitPin(); break;
-        case 21: _t->resetToPureBlack(); break;
+        case 21: _t->erasePinDigit(); break;
+        case 22: _t->handleAuthTimeout(); break;
+        case 23: _t->resetToPureBlack(); break;
         default: ;
         }
     }
@@ -232,14 +240,14 @@ int ScenarioWindow::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 22)
+        if (_id < 24)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 22;
+        _id -= 24;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 22)
+        if (_id < 24)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 22;
+        _id -= 24;
     }
     return _id;
 }

@@ -4,12 +4,24 @@
 #include "mainwindow.h"
 
 #include <QApplication>
+#include <QCoreApplication>
+#include <QDebug>
+#include <QDir>
+#include <QFile>
+#include <QGridLayout>
 #include <QLabel>
 #include <QLineEdit>
 #include <QMessageBox>
+#include <QNetworkAccessManager>
+#include <QNetworkReply>
+#include <QNetworkRequest>
 #include <QPushButton>
+#include <QRandomGenerator>
 #include <QStackedWidget>
+#include <QTextStream>
 #include <QTimer>
+#include <QUrl>
+#include <QUrlQuery>
 #include <QVBoxLayout>
 
 namespace {
@@ -30,6 +42,19 @@ QString levelText(int level)
     return QStringLiteral("1차 경고: 현장 경고 출력 중");
 }
 
+QString unquoteValue(const QString &value)
+{
+    if (value.size() >= 2) {
+        const QChar first = value.front();
+        const QChar last = value.back();
+        if ((first == QLatin1Char('"') && last == QLatin1Char('"')) ||
+            (first == QLatin1Char('\'') && last == QLatin1Char('\''))) {
+            return value.mid(1, value.size() - 2);
+        }
+    }
+    return value;
+}
+
 }
 
 ScenarioWindow::ScenarioWindow(QWidget *parent)
@@ -41,13 +66,21 @@ ScenarioWindow::ScenarioWindow(QWidget *parent)
     m_stack = new QStackedWidget(this);
     m_authScreen = new FaceAuthScreen;
     m_mainScreen = new MainWindowScreen;
+    m_telegramNetwork = new QNetworkAccessManager(this);
+    m_authTimeoutTimer = new QTimer(this);
+    m_authTimeoutTimer->setSingleShot(true);
+    m_authTimeoutTimer->setInterval(10000);         // 10초 간격
 
     connect(m_authScreen, &FaceAuthScreen::faceSuccessTestRequested,
             this, &ScenarioWindow::faceSuccessTestRequested);
     connect(m_authScreen, &FaceAuthScreen::faceFailTestRequested,
             this, &ScenarioWindow::faceFailTestRequested);
+    connect(m_authScreen, &FaceAuthScreen::pinEntryRequested,
+            this, &ScenarioWindow::showPinScreen);
     connect(m_mainScreen, &MainWindowScreen::boardingButtonClicked,
             this, &ScenarioWindow::boardingButtonClicked);
+    connect(m_authTimeoutTimer, &QTimer::timeout,
+            this, &ScenarioWindow::handleAuthTimeout);
 
     m_stack->addWidget(makeBlackScreen());
     m_stack->addWidget(m_authScreen);
@@ -88,6 +121,20 @@ QPushButton *ScenarioWindow::makeButton(const QString &text)
     return button;
 }
 
+QPushButton *ScenarioWindow::makePinDialButton(const QString &text)
+{
+    QPushButton *button = new QPushButton(text);
+    QFont font = button->font();
+    font.setPointSize(24);
+    font.setBold(true);
+    button->setFont(font);
+    button->setMinimumHeight(76);
+    button->setStyleSheet(
+        "QPushButton { background:#1f2937; color:#f8fafc; border:2px solid #64748b; border-radius:12px; padding:10px; }"
+        "QPushButton:pressed { background:#334155; }");
+    return button;
+}
+
 QWidget *ScenarioWindow::makeBlackScreen()
 {
     QWidget *screen = new QWidget;
@@ -105,23 +152,61 @@ QWidget *ScenarioWindow::makePinScreen()
     QWidget *screen = new QWidget;
     screen->setStyleSheet("background:#111827;");
     QVBoxLayout *layout = new QVBoxLayout(screen);
-    layout->setContentsMargins(160, 80, 160, 80);
+    layout->setContentsMargins(200, 52, 200, 52);
     layout->addStretch();
     layout->addWidget(makeLabel(QStringLiteral("PIN 대체 로그인"), 40, true));
-    layout->addWidget(makeLabel(QStringLiteral("얼굴 인식 실패 시 관리자 PIN을 입력합니다. 기본 PIN: 1234"), 20));
+    layout->addWidget(makeLabel(QStringLiteral("텔레그램으로 받은 6자리 PIN을 터치 다이얼로 입력합니다."), 20));
     m_pinEdit = new QLineEdit;
     m_pinEdit->setEchoMode(QLineEdit::Password);
     m_pinEdit->setAlignment(Qt::AlignCenter);
-    m_pinEdit->setMaxLength(12);
+    m_pinEdit->setMaxLength(6);
+    m_pinEdit->setReadOnly(true);
+    m_pinEdit->setFocusPolicy(Qt::NoFocus);
+    m_pinEdit->setInputMethodHints(Qt::ImhDigitsOnly | Qt::ImhNoPredictiveText);
     QFont font = m_pinEdit->font();
     font.setPointSize(28);
     m_pinEdit->setFont(font);
     m_pinEdit->setStyleSheet("background:#020617; color:white; border:2px solid #38bdf8; border-radius:12px; padding:12px;");
-    connect(m_pinEdit, &QLineEdit::returnPressed, this, &ScenarioWindow::submitPin);
     layout->addWidget(m_pinEdit);
-    QPushButton *submitButton = makeButton(QStringLiteral("확인"));
+
+    m_pinStatusLabel = makeLabel(QStringLiteral("PIN 발급 대기"), 16);
+    layout->addWidget(m_pinStatusLabel);
+
+    QGridLayout *dialLayout = new QGridLayout;
+    dialLayout->setSpacing(12);
+    const QStringList digits = {
+        QStringLiteral("1"), QStringLiteral("2"), QStringLiteral("3"),
+        QStringLiteral("4"), QStringLiteral("5"), QStringLiteral("6"),
+        QStringLiteral("7"), QStringLiteral("8"), QStringLiteral("9")
+    };
+
+    for (int i = 0; i < digits.size(); ++i) {
+        const QString digit = digits.at(i);
+        QPushButton *digitButton = makePinDialButton(digit);
+        connect(digitButton, &QPushButton::clicked, this, [this, digit]() {
+            appendPinDigit(digit);
+        });
+        dialLayout->addWidget(digitButton, i / 3, i % 3);
+    }
+
+    QPushButton *eraseButton = makePinDialButton(QStringLiteral("지우기"));
+    connect(eraseButton, &QPushButton::clicked, this, &ScenarioWindow::erasePinDigit);
+    dialLayout->addWidget(eraseButton, 3, 0);
+
+    QPushButton *zeroButton = makePinDialButton(QStringLiteral("0"));
+    connect(zeroButton, &QPushButton::clicked, this, [this]() {
+        appendPinDigit(QStringLiteral("0"));
+    });
+    dialLayout->addWidget(zeroButton, 3, 1);
+
+    QPushButton *submitButton = makePinDialButton(QStringLiteral("확인"));
+    submitButton->setStyleSheet(
+        "QPushButton { background:#155e75; color:white; border:2px solid #67e8f9; border-radius:12px; padding:10px; }"
+        "QPushButton:pressed { background:#0e7490; }");
     connect(submitButton, &QPushButton::clicked, this, &ScenarioWindow::submitPin);
-    layout->addWidget(submitButton);
+    dialLayout->addWidget(submitButton, 3, 2);
+
+    layout->addLayout(dialLayout);
     layout->addStretch();
     return screen;
 }
@@ -176,6 +261,7 @@ QWidget *ScenarioWindow::makeLockedScreen()
 
 void ScenarioWindow::showBlackScreen(bool residualTransition)
 {
+    stopAuthTimeout();
     m_stack->setCurrentIndex(ScreenBlack);
     if (residualTransition) {
         m_blackLabel->setText(QStringLiteral("잔류감지 모드로 전환"));
@@ -196,18 +282,23 @@ void ScenarioWindow::showAuthScreen()
     if (m_authScreen)
         m_authScreen->resetStatus();
     m_stack->setCurrentIndex(ScreenAuth);
+    startAuthTimeout();
 }
 
 void ScenarioWindow::showPinScreen()
 {
+    stopAuthTimeout();
     m_pinFailCount = 0;
     if (m_pinEdit)
         m_pinEdit->clear();
     m_stack->setCurrentIndex(ScreenPin);
+    qInfo() << "[pin] PIN screen shown; issuing Telegram PIN";
+    issuePinCode();
 }
 
 void ScenarioWindow::showReadyScreen(int driverId, int seatPosition, int temperatureTarget)
 {
+    stopAuthTimeout();
     m_lastDriverId = driverId;
     m_readyTitle->setText(QStringLiteral("운전자 인증 완료"));
     m_readyDetail->setText(QStringLiteral("Driver %1 / 좌석 %2 / 목표온도 %3℃\n전원 버튼을 한 번 더 누르면 시동 ON")
@@ -219,6 +310,7 @@ void ScenarioWindow::showReadyScreen(int driverId, int seatPosition, int tempera
 
 void ScenarioWindow::showOperationScreen()
 {
+    stopAuthTimeout();
     if (m_mainScreen)
         m_mainScreen->showOperationMode();
     m_stack->setCurrentIndex(ScreenMain);
@@ -226,6 +318,7 @@ void ScenarioWindow::showOperationScreen()
 
 void ScenarioWindow::showBoardingScreen()
 {
+    stopAuthTimeout();
     if (m_mainScreen)
         m_mainScreen->showBoardingMode();
     m_stack->setCurrentIndex(ScreenMain);
@@ -233,6 +326,7 @@ void ScenarioWindow::showBoardingScreen()
 
 void ScenarioWindow::showChildWarning(int source, int level)
 {
+    stopAuthTimeout();
     m_warningTitle->setText(QStringLiteral("잔류 아동 감지"));
     m_warningDetail->setText(QStringLiteral("%1\n감지 경로: %2\n30초 이내 해제하지 않으면 텔레그램 알림")
                                  .arg(levelText(level))
@@ -287,36 +381,213 @@ void ScenarioWindow::updateFwStatus(int fanLevel, int cabinLed, int ignitionOper
 
 void ScenarioWindow::handleFaceResultSuccess(int driverId)
 {
+    stopAuthTimeout();
     if (m_authScreen)
         m_authScreen->showDriverRecognized(driverId);
 }
 
 void ScenarioWindow::handleFaceResultFail()
 {
+    stopAuthTimeout();
     if (m_authScreen)
         m_authScreen->showUnknownDriver();
     QTimer::singleShot(800, this, &ScenarioWindow::showPinScreen);
 }
 
+void ScenarioWindow::appendPinDigit(const QString &digit)
+{
+    if (!m_pinEdit || m_pinEdit->text().size() >= m_pinEdit->maxLength())
+        return;
+
+    m_pinEdit->setText(m_pinEdit->text() + digit);
+    qInfo() << "[pin] digit entered; length=" << m_pinEdit->text().size();
+}
+
+QString ScenarioWindow::generatePinCode() const
+{
+    const quint32 value = QRandomGenerator::global()->bounded(1000000U);
+    return QStringLiteral("%1").arg(value, 6, 10, QLatin1Char('0'));
+}
+
+void ScenarioWindow::issuePinCode()
+{
+    m_activePinCode = generatePinCode();
+    setPinStatus(QStringLiteral("텔레그램으로 6자리 PIN을 전송 중입니다."));
+    qInfo() << "[pin] generated new 6-digit PIN";
+    sendPinCodeToTelegram(m_activePinCode);
+}
+
+bool ScenarioWindow::loadTelegramConfig(QString *groupId, QString *apiToken) const
+{
+    const QString configuredPath = QString::fromLocal8Bit(qgetenv("TELEGRAM_CONFIG")).trimmed();
+    QStringList candidates;
+    if (!configuredPath.isEmpty())
+        candidates.append(configuredPath);
+    candidates.append(QDir::current().filePath(QStringLiteral("telegram.txt")));
+    candidates.append(QCoreApplication::applicationDirPath() + QStringLiteral("/telegram.txt"));
+    candidates.append(QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("../telegram.txt")));
+    candidates.append(QDir(QCoreApplication::applicationDirPath()).filePath(QStringLiteral("../../telegram.txt")));
+
+    for (const QString &path : candidates) {
+        QFile file(path);
+        qInfo() << "[pin] trying Telegram config:" << path;
+        if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
+            continue;
+
+        QString loadedGroupId;
+        QString loadedApiToken;
+        QTextStream stream(&file);
+        while (!stream.atEnd()) {
+            const QString line = stream.readLine().trimmed();
+            if (line.isEmpty() || line.startsWith(QLatin1Char('#')))
+                continue;
+
+            const int separator = line.indexOf(QLatin1Char('='));
+            if (separator < 0)
+                continue;
+
+            const QString key = line.left(separator).trimmed();
+            const QString value = unquoteValue(line.mid(separator + 1).trimmed());
+            if (key == QStringLiteral("GROUP_ID")) {
+                loadedGroupId = value;
+            } else if (key == QStringLiteral("API_TOKEN")) {
+                loadedApiToken = value;
+            }
+        }
+
+        if (!loadedGroupId.isEmpty() && !loadedApiToken.isEmpty()) {
+            if (groupId)
+                *groupId = loadedGroupId;
+            if (apiToken)
+                *apiToken = loadedApiToken;
+            qInfo() << "[pin] Telegram config loaded from" << path
+                    << "group_id_length=" << loadedGroupId.size()
+                    << "token_length=" << loadedApiToken.size();
+            return true;
+        }
+
+        qWarning() << "[pin] Telegram config missing GROUP_ID or API_TOKEN in" << path;
+    }
+
+    qWarning() << "[pin] Telegram config not found";
+    return false;
+}
+
+void ScenarioWindow::sendPinCodeToTelegram(const QString &pinCode)
+{
+    QString groupId;
+    QString apiToken;
+    if (!loadTelegramConfig(&groupId, &apiToken)) {
+        setPinStatus(QStringLiteral("telegram.txt에서 GROUP_ID/API_TOKEN을 읽지 못했습니다."));
+        return;
+    }
+
+    if (!m_telegramNetwork) {
+        qWarning() << "[pin] Telegram network manager is not initialized";
+        setPinStatus(QStringLiteral("텔레그램 전송 준비가 되지 않았습니다."));
+        return;
+    }
+
+    QUrl url(QStringLiteral("https://api.telegram.org/bot%1/sendMessage").arg(apiToken));
+    QNetworkRequest request(url);
+    request.setHeader(QNetworkRequest::ContentTypeHeader,
+                      QStringLiteral("application/x-www-form-urlencoded"));
+
+    QUrlQuery body;
+    body.addQueryItem(QStringLiteral("chat_id"), groupId);
+    body.addQueryItem(QStringLiteral("text"),
+                      QStringLiteral("통학차량 PIN 로그인 인증번호: %1").arg(pinCode));
+
+    qInfo() << "[pin] sending Telegram PIN message";
+    QNetworkReply *reply = m_telegramNetwork->post(request,
+                                                   body.toString(QUrl::FullyEncoded).toUtf8());
+    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+        const QVariant status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
+        if (reply->error() == QNetworkReply::NoError) {
+            qInfo() << "[pin] Telegram PIN message sent; http_status=" << status;
+            setPinStatus(QStringLiteral("텔레그램으로 PIN을 전송했습니다."));
+        } else {
+            qWarning() << "[pin] Telegram PIN message failed; http_status=" << status
+                       << "error=" << reply->errorString();
+            setPinStatus(QStringLiteral("텔레그램 전송 실패: %1").arg(reply->errorString()));
+        }
+        reply->deleteLater();
+    });
+}
+
+void ScenarioWindow::setPinStatus(const QString &text)
+{
+    if (m_pinStatusLabel)
+        m_pinStatusLabel->setText(text);
+}
+
+void ScenarioWindow::erasePinDigit()
+{
+    if (!m_pinEdit)
+        return;
+
+    QString pin = m_pinEdit->text();
+    if (!pin.isEmpty()) {
+        pin.chop(1);
+        m_pinEdit->setText(pin);
+        qInfo() << "[pin] digit erased; length=" << pin.size();
+    }
+}
+
+void ScenarioWindow::handleAuthTimeout()
+{
+    if (m_stack->currentIndex() == ScreenAuth && m_authScreen)
+        m_authScreen->showPinEntryPrompt();
+}
+
+void ScenarioWindow::startAuthTimeout()
+{
+    if (m_authTimeoutTimer)
+        m_authTimeoutTimer->start();
+}
+
+void ScenarioWindow::stopAuthTimeout()
+{
+    if (m_authTimeoutTimer)
+        m_authTimeoutTimer->stop();
+}
+
 void ScenarioWindow::submitPin()
 {
     const QString pin = m_pinEdit ? m_pinEdit->text().trimmed() : QString();
-    if (pin == QStringLiteral("1234")) {
+    const int requiredLength = m_pinEdit ? m_pinEdit->maxLength() : 6;
+
+    if (m_activePinCode.isEmpty()) {
+        qWarning() << "[pin] submit ignored; no active PIN";
+        setPinStatus(QStringLiteral("PIN이 아직 발급되지 않았습니다."));
+        return;
+    }
+
+    if (pin.size() < requiredLength) {
+        qWarning() << "[pin] submit ignored; incomplete PIN length=" << pin.size();
+        setPinStatus(QStringLiteral("6자리 PIN을 모두 입력하세요."));
+        return;
+    }
+
+    if (pin == m_activePinCode) {
+        qInfo() << "[pin] PIN accepted";
+        m_activePinCode.clear();
         m_pinFailCount = 0;
         emit faceSuccessTestRequested(1);
         return;
     }
 
     ++m_pinFailCount;
+    qWarning() << "[pin] PIN rejected; fail_count=" << m_pinFailCount;
     if (m_pinEdit)
         m_pinEdit->clear();
 
     if (m_pinFailCount >= 3) {
+        qWarning() << "[pin] PIN locked after too many failures";
+        m_activePinCode.clear();
         m_stack->setCurrentIndex(ScreenLocked);
     } else {
-        QMessageBox::warning(this,
-                             QStringLiteral("PIN 오류"),
-                             QStringLiteral("PIN이 올바르지 않습니다. 남은 횟수: %1")
-                                 .arg(3 - m_pinFailCount));
+        setPinStatus(QStringLiteral("PIN이 올바르지 않습니다. 남은 횟수: %1")
+                         .arg(3 - m_pinFailCount));
     }
 }

@@ -488,11 +488,64 @@ qt6_ui/CMakeFiles/school_bus_ui.dir/scenariowindow.cpp.o: \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtGui/qinputmethod.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qlocale.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtGui/qguiapplication_platform.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QCoreApplication \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qcoreapplication.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QDebug \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qdebug.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QDir \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qdir.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qdirlisting.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qfiledevice.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qiodevice.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qdatetime.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qcalendar.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qfile.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/filesystem \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/fs_fwd.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/fs_path.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/locale \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/locale_facets.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/cwctype \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/wctype.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/bits/wctype-wchar.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux/bits/ctype_base.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux/bits/ctype_inline.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/locale_facets.tcc \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/locale_facets_nonio.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux/bits/time_members.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux/bits/messages_members.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/libintl.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/codecvt.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/locale_facets_nonio.tcc \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/locale_conv.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/iomanip \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/quoted_string.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/sstream \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/istream \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/ios \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/basic_ios.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/basic_ios.tcc \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/ostream \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/ostream.tcc \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/istream.tcc \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/sstream.tcc \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/codecvt \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/fs_dir.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/fs_ops.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qfileinfo.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qtimezone.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QFile \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qfile.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/QGridLayout \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qgridlayout.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qlayout.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qlayoutitem.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qboxlayout.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qgridlayout.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/QLabel \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qlabel.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qframe.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtGui/qpicture.h \
- /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qiodevice.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtGui/qtextdocument.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qurl.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/QLineEdit \
@@ -505,16 +558,67 @@ qt6_ui/CMakeFiles/school_bus_ui.dir/scenariowindow.cpp.o: \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qmessagebox.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qdialog.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qdialogbuttonbox.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/QNetworkAccessManager \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qnetworkaccessmanager.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qtnetworkglobal.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qtnetwork-config.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qtnetworkexports.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qnetworkrequest.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qhttpheaders.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QSharedDataPointer \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qshareddata.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QString \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qstring.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QUrl \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qurl.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QVariant \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qvariant.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/q26numeric.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QList \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qlist.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QObject \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qobject.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/QSslConfiguration \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qsslconfiguration.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qsslsocket.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qtcpsocket.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qabstractsocket.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qhostaddress.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qsslerror.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qsslcertificate.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qcryptographichash.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qssl.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QFlags \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qflags.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/QSslPreSharedKeyAuthenticator \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qsslpresharedkeyauthenticator.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QMetaType \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qmetatype.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/QNetworkReply \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qnetworkreply.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QIODevice \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qiodevice.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/QNetworkRequest \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/qnetworkrequest.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/QNetworkAccessManager \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtNetwork/QNetworkRequest \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/QPushButton \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qpushbutton.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qabstractbutton.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QRandomGenerator \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qrandom.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/random \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/random.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux/bits/opt_random.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/bits/random.tcc \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/QStackedWidget \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qstackedwidget.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QTextStream \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qtextstream.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QTimer \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qtimer.h \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QUrl \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/QUrlQuery \
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtCore/qurlquery.h \
  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/QVBoxLayout \
- /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qboxlayout.h \
- /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qlayout.h \
- /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qlayoutitem.h \
- /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qboxlayout.h \
- /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qgridlayout.h
+ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/QtWidgets/qboxlayout.h

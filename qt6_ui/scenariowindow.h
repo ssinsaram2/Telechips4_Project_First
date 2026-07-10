@@ -7,8 +7,10 @@ class FaceAuthScreen;
 class QLabel;
 class QLineEdit;
 class MainWindowScreen;
+class QNetworkAccessManager;
 class QPushButton;
 class QStackedWidget;
+class QTimer;
 
 class ScenarioWindow : public QMainWindow
 {
@@ -43,6 +45,8 @@ public slots:
 
 private slots:
     void submitPin();
+    void erasePinDigit();
+    void handleAuthTimeout();
     void resetToPureBlack();
 
 private:
@@ -64,17 +68,30 @@ private:
     QWidget *makeLockedScreen();
     QLabel *makeLabel(const QString &text, int pointSize, bool bold = false);
     QPushButton *makeButton(const QString &text);
+    QPushButton *makePinDialButton(const QString &text);
+    void appendPinDigit(const QString &digit);
+    QString generatePinCode() const;
+    void issuePinCode();
+    bool loadTelegramConfig(QString *groupId, QString *apiToken) const;
+    void sendPinCodeToTelegram(const QString &pinCode);
+    void setPinStatus(const QString &text);
+    void startAuthTimeout();
+    void stopAuthTimeout();
 
     QStackedWidget *m_stack = nullptr;
     FaceAuthScreen *m_authScreen = nullptr;
     MainWindowScreen *m_mainScreen = nullptr;
+    QNetworkAccessManager *m_telegramNetwork = nullptr;
+    QTimer *m_authTimeoutTimer = nullptr;
     QLabel *m_blackLabel = nullptr;
     QLabel *m_readyTitle = nullptr;
     QLabel *m_readyDetail = nullptr;
     QLabel *m_warningTitle = nullptr;
     QLabel *m_warningDetail = nullptr;
+    QLabel *m_pinStatusLabel = nullptr;
     QLineEdit *m_pinEdit = nullptr;
 
+    QString m_activePinCode;
     int m_pinFailCount = 0;
     int m_lastDriverId = 0;
 };

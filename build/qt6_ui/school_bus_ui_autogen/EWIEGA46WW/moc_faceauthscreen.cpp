@@ -22,8 +22,8 @@ QT_BEGIN_MOC_NAMESPACE
 QT_WARNING_PUSH
 QT_WARNING_DISABLE_DEPRECATED
 struct qt_meta_stringdata_FaceAuthScreen_t {
-    const uint offsetsAndSize[16];
-    char stringdata0[123];
+    const uint offsetsAndSize[20];
+    char stringdata0[160];
 };
 #define QT_MOC_LITERAL(ofs, len) \
     uint(offsetof(qt_meta_stringdata_FaceAuthScreen_t, stringdata0) + ofs), len 
@@ -34,15 +34,18 @@ QT_MOC_LITERAL(15, 24), // "faceSuccessTestRequested"
 QT_MOC_LITERAL(40, 0), // ""
 QT_MOC_LITERAL(41, 8), // "driverId"
 QT_MOC_LITERAL(50, 21), // "faceFailTestRequested"
-QT_MOC_LITERAL(72, 11), // "resetStatus"
-QT_MOC_LITERAL(84, 20), // "showDriverRecognized"
-QT_MOC_LITERAL(105, 17) // "showUnknownDriver"
+QT_MOC_LITERAL(72, 17), // "pinEntryRequested"
+QT_MOC_LITERAL(90, 11), // "resetStatus"
+QT_MOC_LITERAL(102, 20), // "showDriverRecognized"
+QT_MOC_LITERAL(123, 17), // "showUnknownDriver"
+QT_MOC_LITERAL(141, 18) // "showPinEntryPrompt"
 
     },
     "FaceAuthScreen\0faceSuccessTestRequested\0"
     "\0driverId\0faceFailTestRequested\0"
-    "resetStatus\0showDriverRecognized\0"
-    "showUnknownDriver"
+    "pinEntryRequested\0resetStatus\0"
+    "showDriverRecognized\0showUnknownDriver\0"
+    "showPinEntryPrompt"
 };
 #undef QT_MOC_LITERAL
 
@@ -52,29 +55,33 @@ static const uint qt_meta_data_FaceAuthScreen[] = {
       10,       // revision
        0,       // classname
        0,    0, // classinfo
-       5,   14, // methods
+       7,   14, // methods
        0,    0, // properties
        0,    0, // enums/sets
        0,    0, // constructors
        0,       // flags
-       2,       // signalCount
+       3,       // signalCount
 
  // signals: name, argc, parameters, tag, flags, initial metatype offsets
-       1,    1,   44,    2, 0x06,    1 /* Public */,
-       4,    0,   47,    2, 0x06,    3 /* Public */,
+       1,    1,   56,    2, 0x06,    1 /* Public */,
+       4,    0,   59,    2, 0x06,    3 /* Public */,
+       5,    0,   60,    2, 0x06,    4 /* Public */,
 
  // slots: name, argc, parameters, tag, flags, initial metatype offsets
-       5,    0,   48,    2, 0x0a,    4 /* Public */,
-       6,    1,   49,    2, 0x0a,    5 /* Public */,
-       7,    0,   52,    2, 0x0a,    7 /* Public */,
+       6,    0,   61,    2, 0x0a,    5 /* Public */,
+       7,    1,   62,    2, 0x0a,    6 /* Public */,
+       8,    0,   65,    2, 0x0a,    8 /* Public */,
+       9,    0,   66,    2, 0x0a,    9 /* Public */,
 
  // signals: parameters
     QMetaType::Void, QMetaType::Int,    3,
+    QMetaType::Void,
     QMetaType::Void,
 
  // slots: parameters
     QMetaType::Void,
     QMetaType::Void, QMetaType::Int,    3,
+    QMetaType::Void,
     QMetaType::Void,
 
        0        // eod
@@ -88,9 +95,11 @@ void FaceAuthScreen::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         switch (_id) {
         case 0: _t->faceSuccessTestRequested((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         case 1: _t->faceFailTestRequested(); break;
-        case 2: _t->resetStatus(); break;
-        case 3: _t->showDriverRecognized((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 4: _t->showUnknownDriver(); break;
+        case 2: _t->pinEntryRequested(); break;
+        case 3: _t->resetStatus(); break;
+        case 4: _t->showDriverRecognized((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 5: _t->showUnknownDriver(); break;
+        case 6: _t->showPinEntryPrompt(); break;
         default: ;
         }
     } else if (_c == QMetaObject::IndexOfMethod) {
@@ -109,6 +118,13 @@ void FaceAuthScreen::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
                 return;
             }
         }
+        {
+            using _t = void (FaceAuthScreen::*)();
+            if (*reinterpret_cast<_t *>(_a[1]) == static_cast<_t>(&FaceAuthScreen::pinEntryRequested)) {
+                *result = 2;
+                return;
+            }
+        }
     }
 }
 
@@ -119,8 +135,8 @@ const QMetaObject FaceAuthScreen::staticMetaObject = { {
     qt_static_metacall,
     nullptr,
 qt_incomplete_metaTypeArray<qt_meta_stringdata_FaceAuthScreen_t
-, QtPrivate::TypeAndForceComplete<FaceAuthScreen, std::true_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>
-, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>
+, QtPrivate::TypeAndForceComplete<FaceAuthScreen, std::true_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>
+, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<int, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>, QtPrivate::TypeAndForceComplete<void, std::false_type>
 
 
 >,
@@ -147,13 +163,13 @@ int FaceAuthScreen::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 7;
     } else if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 7)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 7;
     }
     return _id;
 }
@@ -169,6 +185,12 @@ void FaceAuthScreen::faceSuccessTestRequested(int _t1)
 void FaceAuthScreen::faceFailTestRequested()
 {
     QMetaObject::activate(this, &staticMetaObject, 1, nullptr);
+}
+
+// SIGNAL 2
+void FaceAuthScreen::pinEntryRequested()
+{
+    QMetaObject::activate(this, &staticMetaObject, 2, nullptr);
 }
 QT_WARNING_POP
 QT_END_MOC_NAMESPACE

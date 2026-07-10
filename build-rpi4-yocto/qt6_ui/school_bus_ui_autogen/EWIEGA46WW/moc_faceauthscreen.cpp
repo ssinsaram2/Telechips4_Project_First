@@ -43,9 +43,11 @@ template <> constexpr inline auto FaceAuthScreen::qt_create_metaobjectdata<qt_me
         "",
         "driverId",
         "faceFailTestRequested",
+        "pinEntryRequested",
         "resetStatus",
         "showDriverRecognized",
-        "showUnknownDriver"
+        "showUnknownDriver",
+        "showPinEntryPrompt"
     };
 
     QtMocHelpers::UintData qt_methods {
@@ -55,14 +57,18 @@ template <> constexpr inline auto FaceAuthScreen::qt_create_metaobjectdata<qt_me
         }}),
         // Signal 'faceFailTestRequested'
         QtMocHelpers::SignalData<void()>(4, 2, QMC::AccessPublic, QMetaType::Void),
+        // Signal 'pinEntryRequested'
+        QtMocHelpers::SignalData<void()>(5, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'resetStatus'
-        QtMocHelpers::SlotData<void()>(5, 2, QMC::AccessPublic, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(6, 2, QMC::AccessPublic, QMetaType::Void),
         // Slot 'showDriverRecognized'
-        QtMocHelpers::SlotData<void(int)>(6, 2, QMC::AccessPublic, QMetaType::Void, {{
+        QtMocHelpers::SlotData<void(int)>(7, 2, QMC::AccessPublic, QMetaType::Void, {{
             { QMetaType::Int, 3 },
         }}),
         // Slot 'showUnknownDriver'
-        QtMocHelpers::SlotData<void()>(7, 2, QMC::AccessPublic, QMetaType::Void),
+        QtMocHelpers::SlotData<void()>(8, 2, QMC::AccessPublic, QMetaType::Void),
+        // Slot 'showPinEntryPrompt'
+        QtMocHelpers::SlotData<void()>(9, 2, QMC::AccessPublic, QMetaType::Void),
     };
     QtMocHelpers::UintData qt_properties {
     };
@@ -88,9 +94,11 @@ void FaceAuthScreen::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         switch (_id) {
         case 0: _t->faceSuccessTestRequested((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
         case 1: _t->faceFailTestRequested(); break;
-        case 2: _t->resetStatus(); break;
-        case 3: _t->showDriverRecognized((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
-        case 4: _t->showUnknownDriver(); break;
+        case 2: _t->pinEntryRequested(); break;
+        case 3: _t->resetStatus(); break;
+        case 4: _t->showDriverRecognized((*reinterpret_cast< std::add_pointer_t<int>>(_a[1]))); break;
+        case 5: _t->showUnknownDriver(); break;
+        case 6: _t->showPinEntryPrompt(); break;
         default: ;
         }
     }
@@ -98,6 +106,8 @@ void FaceAuthScreen::qt_static_metacall(QObject *_o, QMetaObject::Call _c, int _
         if (QtMocHelpers::indexOfMethod<void (FaceAuthScreen::*)(int )>(_a, &FaceAuthScreen::faceSuccessTestRequested, 0))
             return;
         if (QtMocHelpers::indexOfMethod<void (FaceAuthScreen::*)()>(_a, &FaceAuthScreen::faceFailTestRequested, 1))
+            return;
+        if (QtMocHelpers::indexOfMethod<void (FaceAuthScreen::*)()>(_a, &FaceAuthScreen::pinEntryRequested, 2))
             return;
     }
 }
@@ -121,14 +131,14 @@ int FaceAuthScreen::qt_metacall(QMetaObject::Call _c, int _id, void **_a)
     if (_id < 0)
         return _id;
     if (_c == QMetaObject::InvokeMetaMethod) {
-        if (_id < 5)
+        if (_id < 7)
             qt_static_metacall(this, _c, _id, _a);
-        _id -= 5;
+        _id -= 7;
     }
     if (_c == QMetaObject::RegisterMethodArgumentMetaType) {
-        if (_id < 5)
+        if (_id < 7)
             *reinterpret_cast<QMetaType *>(_a[0]) = QMetaType();
-        _id -= 5;
+        _id -= 7;
     }
     return _id;
 }
@@ -143,5 +153,11 @@ void FaceAuthScreen::faceSuccessTestRequested(int _t1)
 void FaceAuthScreen::faceFailTestRequested()
 {
     QMetaObject::activate(this, &staticMetaObject, 1, nullptr);
+}
+
+// SIGNAL 2
+void FaceAuthScreen::pinEntryRequested()
+{
+    QMetaObject::activate(this, &staticMetaObject, 2, nullptr);
 }
 QT_WARNING_POP

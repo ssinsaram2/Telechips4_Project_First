@@ -900,7 +900,7 @@ static void enter_wait_ignition(uint32_t driverId)
             (int32_t)g_profile.seatPosition,
             (int32_t)g_profile.temperatureTarget,
             0);
-    send_ignition_operation(IGNITION_OFF, OP_PARKING);
+    send_ignition_operation(IGNITION_DISPLAY, OP_PARKING);
 }
 
 static void enter_operational_from_wait(void)
