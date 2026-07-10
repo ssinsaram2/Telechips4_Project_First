@@ -229,17 +229,48 @@ static void send_ui(IpcMessageType type, int32_t d0, int32_t d1, int32_t d2, int
     msg.data[2] = d2;
     msg.data[3] = d3;
 
+
     if (g_mqCentralToQt == (mqd_t)-1)
     {
+        printf("[central] send UI failed: queue not open type=%d data=[%d,%d,%d,%d]\n",
+               (int)type,
+               (int)d0,
+               (int)d1,
+               (int)d2,
+               (int)d3);
+        fflush(stdout);
         return;
     }
 
     if (mq_send(g_mqCentralToQt, (const char *)&msg, sizeof(msg), 0) != 0)
     {
+        printf("[central] send UI failed: type=%d data=[%d,%d,%d,%d] errno=%d (%s)\n",
+               (int)type,
+               (int)d0,
+               (int)d1,
+               (int)d2,
+               (int)d3,
+               errno,
+               strerror(errno));
+        fflush(stdout);
+
+
         if (errno != EAGAIN)
         {
             perror("[central] mq_send UI");
         }
+
+        
+    }
+    else
+    {
+        printf("[central] send UI success: type=%d data=[%d,%d,%d,%d]\n",
+               (int)type,
+               (int)d0,
+               (int)d1,
+               (int)d2,
+               (int)d3);
+        fflush(stdout);
     }
 }
 
@@ -842,10 +873,19 @@ static void central_tick(void)
 
 static void enter_driver_auth(void)
 {
+    printf("[central] enter_driver_auth\n");
+    fflush(stdout);
+
     stop_child_monitoring();
+
     g_state = STATE_DRIVER_AUTH;
+
     rpi5_send("OBJECT_OFF");
     rpi5_send("FACE_ON");
+
+    printf("[central] send UI auth screen\n");
+    fflush(stdout);
+
     send_ui(IPC_MSG_SHOW_AUTH_SCREEN, 0, 0, 0, 0);
 }
 
