@@ -35,6 +35,8 @@
 #define CAN_ID_BUZZER_CONTROL           0x0C3U
 #define CAN_ID_OBJECT_DETECTED          0x0D3U
 
+#define WAIT_IGNITION_DEFAULT_TIMEOUT_SEC 30U
+
 #define CAN_VALUE_OFF 0U
 #define CAN_VALUE_ON  1U
 
@@ -102,6 +104,7 @@ static uint32_t g_childAlertEscalationSec = CHILD_ALERT_DEFAULT_ESCALATION_SEC;
 
 static bool g_pirDetected = false;
 static bool g_cameraDetected = false;
+
 
 static const char *queue_name(const char *envName, const char *defaultName)
 {
