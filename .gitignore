@@ -55,3 +55,5 @@ telegram.txt
 *.swo
 *~
 .DS_Store
+build-rpi4-yocto/
+build*/

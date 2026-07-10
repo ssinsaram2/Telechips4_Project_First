@@ -1,4 +1,0 @@
-# Hashes of file build rules.
-7b5d0a2009570876dd316548e00a9b17 qt6_ui/CMakeFiles/school_bus_ui_autogen
-7b5d0a2009570876dd316548e00a9b17 qt6_ui/CMakeFiles/school_bus_ui_autogen_timestamp_deps
-46aa90a8ddd7fe24ead9549d3b7ab5d8 qt6_ui/school_bus_ui_autogen/timestamp
