@@ -1,0 +1,1 @@
+/usr/bin/cc CMakeFiles/central_app.dir/src/central_app.c.o -o central_app  -lrt 

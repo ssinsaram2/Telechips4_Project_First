@@ -1,0 +1,2 @@
+# Hashes of file build rules.
+960cc08eda52787c1f1366566ca0f2aa qt6_ui/CMakeFiles/school_bus_ui_autogen

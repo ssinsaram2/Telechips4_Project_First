@@ -1,0 +1,663 @@
+
+---
+events:
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineSystem.cmake:228 (message)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      The target system is: Linux -  - aarch64
+      The host system is: Linux - 6.18.33.2-microsoft-standard-WSL2 - x86_64
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCCompiler.cmake:123 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the C compiler identification source file "CMakeCCompilerId.c" succeeded.
+      Compiler: /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc -mcpu=cortex-a72+crc;-mbranch-protection=standard;-fstack-protector-strong;-O2;-D_FORTIFY_SOURCE=2;-Wformat;-Wformat-security;-Werror=format-security;--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux
+      Build flags: -O2;-pipe;-g;-feliminate-unused-debug-types
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the C compiler identification source "CMakeCCompilerId.c" produced "a.out"
+      
+      The C compiler identification is GNU, found in:
+        /home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/3.28.3/CompilerIdC/a.out
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake:17 (message)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerId.cmake:64 (__determine_compiler_id_test)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCXXCompiler.cmake:126 (CMAKE_DETERMINE_COMPILER_ID)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Compiling the CXX compiler identification source file "CMakeCXXCompilerId.cpp" succeeded.
+      Compiler: /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++ -mcpu=cortex-a72+crc;-mbranch-protection=standard;-fstack-protector-strong;-O2;-D_FORTIFY_SOURCE=2;-Wformat;-Wformat-security;-Werror=format-security;--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux
+      Build flags: -O2;-pipe;-g;-feliminate-unused-debug-types
+      Id flags:  
+      
+      The output was:
+      0
+      
+      
+      Compilation of the CXX compiler identification source "CMakeCXXCompilerId.cpp" produced "a.out"
+      
+      The CXX compiler identification is GNU, found in:
+        /home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/3.28.3/CompilerIdCXX/a.out
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerABI.cmake:62 (try_compile)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    checks:
+      - "Detecting C compiler ABI info"
+    directories:
+      source: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-2WW3xR"
+      binary: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-2WW3xR"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -O2 -g -feliminate-unused-debug-types "
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now"
+      CMAKE_SYSROOT: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux"
+    buildResult:
+      variable: "CMAKE_C_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-2WW3xR'
+        
+        Run Build Command(s): /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_d0624/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_d0624.dir/build.make CMakeFiles/cmTC_d0624.dir/build
+        gmake[1]: Entering directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-2WW3xR'
+        Building C object CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux   -O2 -g -feliminate-unused-debug-types     -v -o CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o -c /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c
+        Using built-in specs.
+        COLLECT_GCC=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc
+        Target: aarch64-poky-linux
+        Configured with: ../../../../../../work-shared/gcc-13.4.0-r0/gcc-13.4.0/configure --build=x86_64-linux --host=x86_64-pokysdk-linux --target=aarch64-poky-linux --prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --exec_prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --bindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --sbindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --libexecdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux --datadir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share --sysconfdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/etc --sharedstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/com --localstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/var --libdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux --includedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --oldincludedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --infodir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/info --mandir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/man --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot=/host --with-gnu-ld --enable-shared --enable-languages=c,c++ --enable-threads=posix --enable-multilib --enable-default-pie --enable-c99 --enable-long-long --enable-symvers=gnu --enable-libstdcxx-pch --program-prefix=aarch64-poky-linux- --without-local-prefix --disable-install-libiberty --disable-libssp --enable-libitm --enable-lto --disable-bootstrap --with-system-zlib --with-linker-hash-style=gnu --enable-linker-build-id --with-ppl=no --with-cloog=no --enable-checking=release --enable-cheaders=c_global --without-isl --with-gxx-include-dir=/not/exist/usr/include/c++/13.4.0 --with-build-time-tools=/host-native/usr/aarch64-poky-linux/bin --with-sysroot=/not/exist --with-build-sysroot=/host --with-plugin-ld=ld --enable-poison-system-directories --disable-static --enable-nls --with-glibc-version=2.28 --enable-initfini-array --enable-__cxa_atexit
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 13.4.0 (GCC) 
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o' '-c' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_d0624.dir/'
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/cc1 -quiet -v -isysroot /opt/poky/5.0.18/sysroots/cortexa72-poky-linux -D _FORTIFY_SOURCE=2 /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_d0624.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mcpu=cortex-a72+crc -mbranch-protection=standard -mlittle-endian -mabi=lp64 -g -O2 -O2 -Wformat=1 -Wformat-security -Werror=format-security -version -fstack-protector-strong -feliminate-unused-debug-types -o /tmp/cc5bwZ0J.s
+        GNU C17 (GCC) version 13.4.0 (aarch64-poky-linux)
+        	compiled by GNU C version 13.4.0, GMP version 6.3.0, MPFR version 4.2.1, MPC version 1.3.1, isl version none
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        ignoring nonexistent directory "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/local/include"
+        ignoring nonexistent directory "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/../../../../../aarch64-poky-linux/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include
+         /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed
+         /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/
+        End of search list.
+        Compiler executable checksum: be6d3d82bef8ad2a1764dda52880ac97
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o' '-c' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_d0624.dir/'
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/as -v --gdwarf-5 -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o /tmp/cc5bwZ0J.s
+        GNU assembler version 2.42.0 (aarch64-poky-linux) using BFD version (GNU Binutils) 2.42.0.20240723
+        COMPILER_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/
+        LIBRARY_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o' '-c' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.'
+        Linking C executable cmTC_d0624
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d0624.dir/link.txt --verbose=1
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux  -O2 -g -feliminate-unused-debug-types   -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now -v CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o -o cmTC_d0624 
+        Using built-in specs.
+        COLLECT_GCC=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc
+        COLLECT_LTO_WRAPPER=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper
+        Target: aarch64-poky-linux
+        Configured with: ../../../../../../work-shared/gcc-13.4.0-r0/gcc-13.4.0/configure --build=x86_64-linux --host=x86_64-pokysdk-linux --target=aarch64-poky-linux --prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --exec_prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --bindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --sbindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --libexecdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux --datadir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share --sysconfdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/etc --sharedstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/com --localstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/var --libdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux --includedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --oldincludedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --infodir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/info --mandir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/man --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot=/host --with-gnu-ld --enable-shared --enable-languages=c,c++ --enable-threads=posix --enable-multilib --enable-default-pie --enable-c99 --enable-long-long --enable-symvers=gnu --enable-libstdcxx-pch --program-prefix=aarch64-poky-linux- --without-local-prefix --disable-install-libiberty --disable-libssp --enable-libitm --enable-lto --disable-bootstrap --with-system-zlib --with-linker-hash-style=gnu --enable-linker-build-id --with-ppl=no --with-cloog=no --enable-checking=release --enable-cheaders=c_global --without-isl --with-gxx-include-dir=/not/exist/usr/include/c++/13.4.0 --with-build-time-tools=/host-native/usr/aarch64-poky-linux/bin --with-sysroot=/not/exist --with-build-sysroot=/host --with-plugin-ld=ld --enable-poison-system-directories --disable-static --enable-nls --with-glibc-version=2.28 --enable-initfini-array --enable-__cxa_atexit
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 13.4.0 (GCC) 
+        COMPILER_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/
+        LIBRARY_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'cmTC_d0624' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'cmTC_d0624.'
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/collect2 -plugin /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/liblto_plugin.so -plugin-opt=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccQnjkbC.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --build-id --eh-frame-hdr --hash-style=gnu -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -pie -o cmTC_d0624 /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o -L/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib -O1 --hash-style=gnu --as-needed -z relro -z now CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'cmTC_d0624' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'cmTC_d0624.'
+        gmake[1]: Leaving directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-2WW3xR'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerABI.cmake:132 (message)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed C implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include]
+          add: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include]
+          add: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed]
+          add: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/]
+        end of search list found
+        collapse include dir [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include] ==> [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include]
+        collapse include dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include]
+        collapse include dir [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed] ==> [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed]
+        collapse include dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include]
+        implicit include dirs: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include;/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerABI.cmake:164 (message)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeTestCCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed C implicit link information:
+        link line regex: [^( *|.*[/\\])(aarch64-poky-linux-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-2WW3xR']
+        ignore line: []
+        ignore line: [Run Build Command(s): /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_d0624/fast]
+        ignore line: [/usr/bin/gmake  -f CMakeFiles/cmTC_d0624.dir/build.make CMakeFiles/cmTC_d0624.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-2WW3xR']
+        ignore line: [Building C object CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o]
+        ignore line: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux   -O2 -g -feliminate-unused-debug-types     -v -o CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o -c /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc]
+        ignore line: [Target: aarch64-poky-linux]
+        ignore line: [Configured with: ../../../../../../work-shared/gcc-13.4.0-r0/gcc-13.4.0/configure --build=x86_64-linux --host=x86_64-pokysdk-linux --target=aarch64-poky-linux --prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --exec_prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --bindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --sbindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --libexecdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux --datadir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share --sysconfdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/etc --sharedstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/com --localstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/var --libdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux --includedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --oldincludedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --infodir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/info --mandir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/man --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot=/host --with-gnu-ld --enable-shared --enable-languages=c,c++ --enable-threads=posix --enable-multilib --enable-default-pie --enable-c99 --enable-long-long --enable-symvers=gnu --enable-libstdcxx-pch --program-prefix=aarch64-poky-linux- --without-local-prefix --disable-install-libiberty --disable-libssp --enable-libitm --enable-lto --disable-bootstrap --with-system-zlib --with-linker-hash-style=gnu --enable-linker-build-id --with-ppl=no --with-cloog=no --enable-checking=release --enable-cheaders=c_global --without-isl --with-gxx-include-dir=/not/exist/usr/include/c++/13.4.0 --with-build-time-tools=/host-native/usr/aarch64-poky-linux/bin --with-sysroot=/not/exist --with-build-sysroot=/host --with-plugin-ld=ld --enable-poison-system-directories --disable-static --enable-nls --with-glibc-version=2.28 --enable-initfini-array --enable-__cxa_atexit]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 13.4.0 (GCC) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o' '-c' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_d0624.dir/']
+        ignore line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/cc1 -quiet -v -isysroot /opt/poky/5.0.18/sysroots/cortexa72-poky-linux -D _FORTIFY_SOURCE=2 /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeCCompilerABI.c -quiet -dumpdir CMakeFiles/cmTC_d0624.dir/ -dumpbase CMakeCCompilerABI.c.c -dumpbase-ext .c -mcpu=cortex-a72+crc -mbranch-protection=standard -mlittle-endian -mabi=lp64 -g -O2 -O2 -Wformat=1 -Wformat-security -Werror=format-security -version -fstack-protector-strong -feliminate-unused-debug-types -o /tmp/cc5bwZ0J.s]
+        ignore line: [GNU C17 (GCC) version 13.4.0 (aarch64-poky-linux)]
+        ignore line: [	compiled by GNU C version 13.4.0  GMP version 6.3.0  MPFR version 4.2.1  MPC version 1.3.1  isl version none]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [ignoring nonexistent directory "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/local/include"]
+        ignore line: [ignoring nonexistent directory "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/../../../../../aarch64-poky-linux/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include]
+        ignore line: [ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include]
+        ignore line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed]
+        ignore line: [ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/]
+        ignore line: [End of search list.]
+        ignore line: [Compiler executable checksum: be6d3d82bef8ad2a1764dda52880ac97]
+        ignore line: [COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o' '-c' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_d0624.dir/']
+        ignore line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/as -v --gdwarf-5 -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o /tmp/cc5bwZ0J.s]
+        ignore line: [GNU assembler version 2.42.0 (aarch64-poky-linux) using BFD version (GNU Binutils) 2.42.0.20240723]
+        ignore line: [COMPILER_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/]
+        ignore line: [LIBRARY_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o' '-c' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.']
+        ignore line: [Linking C executable cmTC_d0624]
+        ignore line: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_d0624.dir/link.txt --verbose=1]
+        ignore line: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux  -O2 -g -feliminate-unused-debug-types   -Wl -O1 -Wl --hash-style=gnu -Wl --as-needed  -Wl -z relro -z now -v CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o -o cmTC_d0624 ]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc]
+        ignore line: [COLLECT_LTO_WRAPPER=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper]
+        ignore line: [Target: aarch64-poky-linux]
+        ignore line: [Configured with: ../../../../../../work-shared/gcc-13.4.0-r0/gcc-13.4.0/configure --build=x86_64-linux --host=x86_64-pokysdk-linux --target=aarch64-poky-linux --prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --exec_prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --bindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --sbindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --libexecdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux --datadir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share --sysconfdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/etc --sharedstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/com --localstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/var --libdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux --includedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --oldincludedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --infodir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/info --mandir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/man --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot=/host --with-gnu-ld --enable-shared --enable-languages=c,c++ --enable-threads=posix --enable-multilib --enable-default-pie --enable-c99 --enable-long-long --enable-symvers=gnu --enable-libstdcxx-pch --program-prefix=aarch64-poky-linux- --without-local-prefix --disable-install-libiberty --disable-libssp --enable-libitm --enable-lto --disable-bootstrap --with-system-zlib --with-linker-hash-style=gnu --enable-linker-build-id --with-ppl=no --with-cloog=no --enable-checking=release --enable-cheaders=c_global --without-isl --with-gxx-include-dir=/not/exist/usr/include/c++/13.4.0 --with-build-time-tools=/host-native/usr/aarch64-poky-linux/bin --with-sysroot=/not/exist --with-build-sysroot=/host --with-plugin-ld=ld --enable-poison-system-directories --disable-static --enable-nls --with-glibc-version=2.28 --enable-initfini-array --enable-__cxa_atexit]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 13.4.0 (GCC) ]
+        ignore line: [COMPILER_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/]
+        ignore line: [LIBRARY_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'cmTC_d0624' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'cmTC_d0624.']
+        link line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/collect2 -plugin /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/liblto_plugin.so -plugin-opt=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccQnjkbC.res -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lgcc_s --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --build-id --eh-frame-hdr --hash-style=gnu -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -pie -o cmTC_d0624 /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o -L/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib -O1 --hash-style=gnu --as-needed -z relro -z now CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o -lgcc --push-state --as-needed -lgcc_s --pop-state -lc -lgcc --push-state --as-needed -lgcc_s --pop-state /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o]
+          arg [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/collect2] ==> ignore
+          arg [-plugin] ==> ignore
+          arg [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/liblto_plugin.so] ==> ignore
+          arg [-plugin-opt=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/ccQnjkbC.res] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib/ld-linux-aarch64.so.1] ==> ignore
+          arg [-X] ==> ignore
+          arg [-EL] ==> ignore
+          arg [-maarch64linux] ==> ignore
+          arg [-pie] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_d0624] ==> ignore
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o]
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o]
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o]
+          arg [-L/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0] ==> dir [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0]
+          arg [-L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0] ==> dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0]
+          arg [-L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib] ==> dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib]
+          arg [-L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0] ==> dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0]
+          arg [-L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib] ==> dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib]
+          arg [-O1] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [--as-needed] ==> ignore
+          arg [-zrelro] ==> ignore
+          arg [-znow] ==> ignore
+          arg [CMakeFiles/cmTC_d0624.dir/CMakeCCompilerABI.c.o] ==> ignore
+          arg [-lgcc] ==> lib [gcc]
+          arg [--push-state] ==> ignore
+          arg [--as-needed] ==> ignore
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [--pop-state] ==> ignore
+          arg [-lc] ==> lib [c]
+          arg [-lgcc] ==> lib [gcc]
+          arg [--push-state] ==> ignore
+          arg [--as-needed] ==> ignore
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [--pop-state] ==> ignore
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o]
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o]
+        collapse library dir [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0] ==> [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0]
+        collapse library dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0]
+        collapse library dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib]
+        collapse library dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0]
+        collapse library dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib]
+        implicit libs: [gcc;gcc_s;c;gcc;gcc_s]
+        implicit objs: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o]
+        implicit dirs: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerABI.cmake:62 (try_compile)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    checks:
+      - "Detecting CXX compiler ABI info"
+    directories:
+      source: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-EYSFfm"
+      binary: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-EYSFfm"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -O2 -g -feliminate-unused-debug-types "
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now"
+      CMAKE_SYSROOT: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux"
+    buildResult:
+      variable: "CMAKE_CXX_ABI_COMPILED"
+      cached: true
+      stdout: |
+        Change Dir: '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-EYSFfm'
+        
+        Run Build Command(s): /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_99cce/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_99cce.dir/build.make CMakeFiles/cmTC_99cce.dir/build
+        gmake[1]: Entering directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-EYSFfm'
+        Building CXX object CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux   -O2 -g -feliminate-unused-debug-types     -v -o CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o -c /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp
+        Using built-in specs.
+        COLLECT_GCC=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++
+        Target: aarch64-poky-linux
+        Configured with: ../../../../../../work-shared/gcc-13.4.0-r0/gcc-13.4.0/configure --build=x86_64-linux --host=x86_64-pokysdk-linux --target=aarch64-poky-linux --prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --exec_prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --bindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --sbindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --libexecdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux --datadir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share --sysconfdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/etc --sharedstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/com --localstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/var --libdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux --includedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --oldincludedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --infodir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/info --mandir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/man --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot=/host --with-gnu-ld --enable-shared --enable-languages=c,c++ --enable-threads=posix --enable-multilib --enable-default-pie --enable-c99 --enable-long-long --enable-symvers=gnu --enable-libstdcxx-pch --program-prefix=aarch64-poky-linux- --without-local-prefix --disable-install-libiberty --disable-libssp --enable-libitm --enable-lto --disable-bootstrap --with-system-zlib --with-linker-hash-style=gnu --enable-linker-build-id --with-ppl=no --with-cloog=no --enable-checking=release --enable-cheaders=c_global --without-isl --with-gxx-include-dir=/not/exist/usr/include/c++/13.4.0 --with-build-time-tools=/host-native/usr/aarch64-poky-linux/bin --with-sysroot=/not/exist --with-build-sysroot=/host --with-plugin-ld=ld --enable-poison-system-directories --disable-static --enable-nls --with-glibc-version=2.28 --enable-initfini-array --enable-__cxa_atexit
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 13.4.0 (GCC) 
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_99cce.dir/'
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/cc1plus -quiet -v -isysroot /opt/poky/5.0.18/sysroots/cortexa72-poky-linux -D_GNU_SOURCE -D _FORTIFY_SOURCE=2 /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_99cce.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mcpu=cortex-a72+crc -mbranch-protection=standard -mlittle-endian -mabi=lp64 -g -O2 -O2 -Wformat=1 -Wformat-security -Werror=format-security -version -fstack-protector-strong -feliminate-unused-debug-types -o /tmp/ccDnS2Dw.s
+        GNU C++17 (GCC) version 13.4.0 (aarch64-poky-linux)
+        	compiled by GNU C version 13.4.0, GMP version 6.3.0, MPFR version 4.2.1, MPC version 1.3.1, isl version none
+        GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072
+        ignoring nonexistent directory "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/local/include"
+        ignoring nonexistent directory "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/../../../../../aarch64-poky-linux/include"
+        #include "..." search starts here:
+        #include <...> search starts here:
+         /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0
+         /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux
+         /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/backward
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include
+         /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed
+         /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/
+        End of search list.
+        Compiler executable checksum: ebdb588fdf71317f679f23653a0d6fdf
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_99cce.dir/'
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/as -v --gdwarf-5 -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccDnS2Dw.s
+        GNU assembler version 2.42.0 (aarch64-poky-linux) using BFD version (GNU Binutils) 2.42.0.20240723
+        COMPILER_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/
+        LIBRARY_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.'
+        Linking CXX executable cmTC_99cce
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_99cce.dir/link.txt --verbose=1
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux  -O2 -g -feliminate-unused-debug-types   -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now -v CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_99cce 
+        Using built-in specs.
+        COLLECT_GCC=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++
+        COLLECT_LTO_WRAPPER=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper
+        Target: aarch64-poky-linux
+        Configured with: ../../../../../../work-shared/gcc-13.4.0-r0/gcc-13.4.0/configure --build=x86_64-linux --host=x86_64-pokysdk-linux --target=aarch64-poky-linux --prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --exec_prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --bindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --sbindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --libexecdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux --datadir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share --sysconfdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/etc --sharedstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/com --localstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/var --libdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux --includedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --oldincludedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --infodir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/info --mandir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/man --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot=/host --with-gnu-ld --enable-shared --enable-languages=c,c++ --enable-threads=posix --enable-multilib --enable-default-pie --enable-c99 --enable-long-long --enable-symvers=gnu --enable-libstdcxx-pch --program-prefix=aarch64-poky-linux- --without-local-prefix --disable-install-libiberty --disable-libssp --enable-libitm --enable-lto --disable-bootstrap --with-system-zlib --with-linker-hash-style=gnu --enable-linker-build-id --with-ppl=no --with-cloog=no --enable-checking=release --enable-cheaders=c_global --without-isl --with-gxx-include-dir=/not/exist/usr/include/c++/13.4.0 --with-build-time-tools=/host-native/usr/aarch64-poky-linux/bin --with-sysroot=/not/exist --with-build-sysroot=/host --with-plugin-ld=ld --enable-poison-system-directories --disable-static --enable-nls --with-glibc-version=2.28 --enable-initfini-array --enable-__cxa_atexit
+        Thread model: posix
+        Supported LTO compression algorithms: zlib zstd
+        gcc version 13.4.0 (GCC) 
+        COMPILER_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/
+        LIBRARY_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'cmTC_99cce' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'cmTC_99cce.'
+         /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/collect2 -plugin /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/liblto_plugin.so -plugin-opt=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccztCrxN.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --build-id --eh-frame-hdr --hash-style=gnu -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -pie -o cmTC_99cce /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o -L/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib -O1 --hash-style=gnu --as-needed -z relro -z now CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o
+        COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'cmTC_99cce' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'cmTC_99cce.'
+        gmake[1]: Leaving directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-EYSFfm'
+        
+      exitCode: 0
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerABI.cmake:132 (message)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed CXX implicit include dir info: rv=done
+        found start of include info
+        found start of implicit include info
+          add: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0]
+          add: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux]
+          add: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/backward]
+          add: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include]
+          add: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include]
+          add: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed]
+          add: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/]
+        end of search list found
+        collapse include dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0]
+        collapse include dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux]
+        collapse include dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/backward] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/backward]
+        collapse include dir [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include] ==> [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include]
+        collapse include dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include]
+        collapse include dir [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed] ==> [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed]
+        collapse include dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include]
+        implicit include dirs: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/backward;/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include;/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include]
+      
+      
+  -
+    kind: "message-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeDetermineCompilerABI.cmake:164 (message)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeTestCXXCompiler.cmake:26 (CMAKE_DETERMINE_COMPILER_ABI)"
+      - "CMakeLists.txt:2 (project)"
+    message: |
+      Parsed CXX implicit link information:
+        link line regex: [^( *|.*[/\\])(aarch64-poky-linux-ld|CMAKE_LINK_STARTFILE-NOTFOUND|([^/\\]+-)?ld|collect2)[^/\\]*( |$)]
+        ignore line: [Change Dir: '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-EYSFfm']
+        ignore line: []
+        ignore line: [Run Build Command(s): /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_99cce/fast]
+        ignore line: [/usr/bin/gmake  -f CMakeFiles/cmTC_99cce.dir/build.make CMakeFiles/cmTC_99cce.dir/build]
+        ignore line: [gmake[1]: Entering directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-EYSFfm']
+        ignore line: [Building CXX object CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o]
+        ignore line: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux   -O2 -g -feliminate-unused-debug-types     -v -o CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o -c /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++]
+        ignore line: [Target: aarch64-poky-linux]
+        ignore line: [Configured with: ../../../../../../work-shared/gcc-13.4.0-r0/gcc-13.4.0/configure --build=x86_64-linux --host=x86_64-pokysdk-linux --target=aarch64-poky-linux --prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --exec_prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --bindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --sbindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --libexecdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux --datadir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share --sysconfdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/etc --sharedstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/com --localstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/var --libdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux --includedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --oldincludedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --infodir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/info --mandir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/man --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot=/host --with-gnu-ld --enable-shared --enable-languages=c,c++ --enable-threads=posix --enable-multilib --enable-default-pie --enable-c99 --enable-long-long --enable-symvers=gnu --enable-libstdcxx-pch --program-prefix=aarch64-poky-linux- --without-local-prefix --disable-install-libiberty --disable-libssp --enable-libitm --enable-lto --disable-bootstrap --with-system-zlib --with-linker-hash-style=gnu --enable-linker-build-id --with-ppl=no --with-cloog=no --enable-checking=release --enable-cheaders=c_global --without-isl --with-gxx-include-dir=/not/exist/usr/include/c++/13.4.0 --with-build-time-tools=/host-native/usr/aarch64-poky-linux/bin --with-sysroot=/not/exist --with-build-sysroot=/host --with-plugin-ld=ld --enable-poison-system-directories --disable-static --enable-nls --with-glibc-version=2.28 --enable-initfini-array --enable-__cxa_atexit]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 13.4.0 (GCC) ]
+        ignore line: [COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_99cce.dir/']
+        ignore line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/cc1plus -quiet -v -isysroot /opt/poky/5.0.18/sysroots/cortexa72-poky-linux -D_GNU_SOURCE -D _FORTIFY_SOURCE=2 /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeCXXCompilerABI.cpp -quiet -dumpdir CMakeFiles/cmTC_99cce.dir/ -dumpbase CMakeCXXCompilerABI.cpp.cpp -dumpbase-ext .cpp -mcpu=cortex-a72+crc -mbranch-protection=standard -mlittle-endian -mabi=lp64 -g -O2 -O2 -Wformat=1 -Wformat-security -Werror=format-security -version -fstack-protector-strong -feliminate-unused-debug-types -o /tmp/ccDnS2Dw.s]
+        ignore line: [GNU C++17 (GCC) version 13.4.0 (aarch64-poky-linux)]
+        ignore line: [	compiled by GNU C version 13.4.0  GMP version 6.3.0  MPFR version 4.2.1  MPC version 1.3.1  isl version none]
+        ignore line: [GGC heuristics: --param ggc-min-expand=100 --param ggc-min-heapsize=131072]
+        ignore line: [ignoring nonexistent directory "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/local/include"]
+        ignore line: [ignoring nonexistent directory "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/../../../../../aarch64-poky-linux/include"]
+        ignore line: [#include "..." search starts here:]
+        ignore line: [#include <...> search starts here:]
+        ignore line: [ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0]
+        ignore line: [ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/aarch64-poky-linux]
+        ignore line: [ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/c++/13.4.0/backward]
+        ignore line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include]
+        ignore line: [ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/include]
+        ignore line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/include-fixed]
+        ignore line: [ /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/include/]
+        ignore line: [End of search list.]
+        ignore line: [Compiler executable checksum: ebdb588fdf71317f679f23653a0d6fdf]
+        ignore line: [COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_99cce.dir/']
+        ignore line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/as -v --gdwarf-5 -EL -march=armv8-a+crc -mabi=lp64 -o CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o /tmp/ccDnS2Dw.s]
+        ignore line: [GNU assembler version 2.42.0 (aarch64-poky-linux) using BFD version (GNU Binutils) 2.42.0.20240723]
+        ignore line: [COMPILER_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/]
+        ignore line: [LIBRARY_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o' '-c' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.']
+        ignore line: [Linking CXX executable cmTC_99cce]
+        ignore line: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_99cce.dir/link.txt --verbose=1]
+        ignore line: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux  -O2 -g -feliminate-unused-debug-types   -Wl -O1 -Wl --hash-style=gnu -Wl --as-needed  -Wl -z relro -z now -v CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o -o cmTC_99cce ]
+        ignore line: [Using built-in specs.]
+        ignore line: [COLLECT_GCC=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++]
+        ignore line: [COLLECT_LTO_WRAPPER=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper]
+        ignore line: [Target: aarch64-poky-linux]
+        ignore line: [Configured with: ../../../../../../work-shared/gcc-13.4.0-r0/gcc-13.4.0/configure --build=x86_64-linux --host=x86_64-pokysdk-linux --target=aarch64-poky-linux --prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --exec_prefix=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr --bindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --sbindir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux --libexecdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux --datadir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share --sysconfdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/etc --sharedstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/com --localstatedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/var --libdir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux --includedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --oldincludedir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/include --infodir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/info --mandir=/usr/local/oe-sdk-hardcoded-buildpath/sysroots/x86_64-pokysdk-linux/usr/share/man --disable-silent-rules --disable-dependency-tracking --with-libtool-sysroot=/host --with-gnu-ld --enable-shared --enable-languages=c,c++ --enable-threads=posix --enable-multilib --enable-default-pie --enable-c99 --enable-long-long --enable-symvers=gnu --enable-libstdcxx-pch --program-prefix=aarch64-poky-linux- --without-local-prefix --disable-install-libiberty --disable-libssp --enable-libitm --enable-lto --disable-bootstrap --with-system-zlib --with-linker-hash-style=gnu --enable-linker-build-id --with-ppl=no --with-cloog=no --enable-checking=release --enable-cheaders=c_global --without-isl --with-gxx-include-dir=/not/exist/usr/include/c++/13.4.0 --with-build-time-tools=/host-native/usr/aarch64-poky-linux/bin --with-sysroot=/not/exist --with-build-sysroot=/host --with-plugin-ld=ld --enable-poison-system-directories --disable-static --enable-nls --with-glibc-version=2.28 --enable-initfini-array --enable-__cxa_atexit]
+        ignore line: [Thread model: posix]
+        ignore line: [Supported LTO compression algorithms: zlib zstd]
+        ignore line: [gcc version 13.4.0 (GCC) ]
+        ignore line: [COMPILER_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/]
+        ignore line: [LIBRARY_PATH=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0/:/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/]
+        ignore line: [COLLECT_GCC_OPTIONS='-mcpu=cortex-a72+crc' '-mbranch-protection=standard' '-fstack-protector-strong' '-O2' '-D' '_FORTIFY_SOURCE=2' '-Wformat=1' '-Wformat-security' '-Werror=format-security' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux' '-O2' '-g' '-feliminate-unused-debug-types' '-v' '-o' 'cmTC_99cce' '-shared-libgcc' '-mlittle-endian' '-mabi=lp64' '-dumpdir' 'cmTC_99cce.']
+        link line: [ /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/collect2 -plugin /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/liblto_plugin.so -plugin-opt=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper -plugin-opt=-fresolution=/tmp/ccztCrxN.res -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc -plugin-opt=-pass-through=-lc -plugin-opt=-pass-through=-lgcc_s -plugin-opt=-pass-through=-lgcc --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --build-id --eh-frame-hdr --hash-style=gnu -dynamic-linker /lib/ld-linux-aarch64.so.1 -X -EL -maarch64linux -pie -o cmTC_99cce /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o -L/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0 -L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib -O1 --hash-style=gnu --as-needed -z relro -z now CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o -lstdc++ -lm -lgcc_s -lgcc -lc -lgcc_s -lgcc /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o]
+          arg [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/collect2] ==> ignore
+          arg [-plugin] ==> ignore
+          arg [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/liblto_plugin.so] ==> ignore
+          arg [-plugin-opt=/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/libexec/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0/lto-wrapper] ==> ignore
+          arg [-plugin-opt=-fresolution=/tmp/ccztCrxN.res] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lc] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc_s] ==> ignore
+          arg [-plugin-opt=-pass-through=-lgcc] ==> ignore
+          arg [--sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux] ==> ignore
+          arg [--build-id] ==> ignore
+          arg [--eh-frame-hdr] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [-dynamic-linker] ==> ignore
+          arg [/lib/ld-linux-aarch64.so.1] ==> ignore
+          arg [-X] ==> ignore
+          arg [-EL] ==> ignore
+          arg [-maarch64linux] ==> ignore
+          arg [-pie] ==> ignore
+          arg [-o] ==> ignore
+          arg [cmTC_99cce] ==> ignore
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o]
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o]
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o]
+          arg [-L/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0] ==> dir [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0]
+          arg [-L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0] ==> dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0]
+          arg [-L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib] ==> dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib]
+          arg [-L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0] ==> dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0]
+          arg [-L/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib] ==> dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib]
+          arg [-O1] ==> ignore
+          arg [--hash-style=gnu] ==> ignore
+          arg [--as-needed] ==> ignore
+          arg [-zrelro] ==> ignore
+          arg [-znow] ==> ignore
+          arg [CMakeFiles/cmTC_99cce.dir/CMakeCXXCompilerABI.cpp.o] ==> ignore
+          arg [-lstdc++] ==> lib [stdc++]
+          arg [-lm] ==> lib [m]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [-lc] ==> lib [c]
+          arg [-lgcc_s] ==> lib [gcc_s]
+          arg [-lgcc] ==> lib [gcc]
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o]
+          arg [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o] ==> obj [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o]
+        collapse library dir [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0] ==> [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0]
+        collapse library dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0]
+        collapse library dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib]
+        collapse library dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0]
+        collapse library dir [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib] ==> [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib]
+        implicit libs: [stdc++;m;gcc_s;gcc;c;gcc_s;gcc]
+        implicit objs: [/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/Scrt1.o;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crti.o;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtbeginS.o;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0/crtendS.o;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/crtn.o]
+        implicit dirs: [/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/lib/aarch64-poky-linux/gcc/aarch64-poky-linux/13.4.0;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib/aarch64-poky-linux/13.4.0;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/lib;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/aarch64-poky-linux/13.4.0;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib]
+        implicit fwks: []
+      
+      
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CheckCSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/FindThreads.cmake:97 (CHECK_C_SOURCE_COMPILES)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/FindThreads.cmake:163 (_threads_check_libc)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:36 (find_dependency)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/Qt6Dependencies.cmake:33 (_qt_internal_find_third_party_dependencies)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/Qt6Config.cmake:184 (include)"
+      - "qt6_ui/CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Performing Test CMAKE_HAVE_LIBC_PTHREAD"
+    directories:
+      source: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-OPfs3a"
+      binary: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-OPfs3a"
+    cmakeVariables:
+      CMAKE_C_FLAGS: " -O2 -pipe -g -feliminate-unused-debug-types "
+      CMAKE_C_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now"
+      CMAKE_MODULE_PATH: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/extra-cmake-modules/find-modules;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/kwin"
+      CMAKE_SYSROOT: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux"
+    buildResult:
+      variable: "CMAKE_HAVE_LIBC_PTHREAD"
+      cached: true
+      stdout: |
+        Change Dir: '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-OPfs3a'
+        
+        Run Build Command(s): /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_cdf40/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_cdf40.dir/build.make CMakeFiles/cmTC_cdf40.dir/build
+        gmake[1]: Entering directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-OPfs3a'
+        Building C object CMakeFiles/cmTC_cdf40.dir/src.c.o
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux -DCMAKE_HAVE_LIBC_PTHREAD  -O2 -pipe -g -feliminate-unused-debug-types   -o CMakeFiles/cmTC_cdf40.dir/src.c.o -c /home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-OPfs3a/src.c
+        Linking C executable cmTC_cdf40
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_cdf40.dir/link.txt --verbose=1
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-gcc   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux  -O2 -pipe -g -feliminate-unused-debug-types   -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now  CMakeFiles/cmTC_cdf40.dir/src.c.o -o cmTC_cdf40 
+        gmake[1]: Leaving directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-OPfs3a'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/FindWrapAtomic.cmake:36 (check_cxx_source_compiles)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:36 (find_dependency)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Core/Qt6CoreDependencies.cmake:35 (_qt_internal_find_third_party_dependencies)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Core/Qt6CoreConfig.cmake:55 (include)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/Qt6Config.cmake:245 (find_package)"
+      - "qt6_ui/CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Performing Test HAVE_STDATOMIC"
+    directories:
+      source: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-jsi8AH"
+      binary: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-jsi8AH"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -O2 -pipe -g -feliminate-unused-debug-types "
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now"
+      CMAKE_MODULE_PATH: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/extra-cmake-modules/find-modules;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/kwin"
+      CMAKE_SYSROOT: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux"
+    buildResult:
+      variable: "HAVE_STDATOMIC"
+      cached: true
+      stdout: |
+        Change Dir: '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-jsi8AH'
+        
+        Run Build Command(s): /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_9db08/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_9db08.dir/build.make CMakeFiles/cmTC_9db08.dir/build
+        gmake[1]: Entering directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-jsi8AH'
+        Building CXX object CMakeFiles/cmTC_9db08.dir/src.cxx.o
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux -DHAVE_STDATOMIC  -O2 -pipe -g -feliminate-unused-debug-types   -std=gnu++17 -o CMakeFiles/cmTC_9db08.dir/src.cxx.o -c /home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-jsi8AH/src.cxx
+        Linking CXX executable cmTC_9db08
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_9db08.dir/link.txt --verbose=1
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux  -O2 -pipe -g -feliminate-unused-debug-types   -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now  CMakeFiles/cmTC_9db08.dir/src.cxx.o -o cmTC_9db08 
+        gmake[1]: Leaving directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-jsi8AH'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/extra-cmake-modules/find-modules/FindEGL.cmake:128 (check_cxx_source_compiles)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/FindGLESv2.cmake:13 (find_package)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:36 (find_dependency)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Gui/Qt6GuiDependencies.cmake:36 (_qt_internal_find_third_party_dependencies)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Gui/Qt6GuiConfig.cmake:53 (include)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:142 (find_dependency)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Widgets/Qt6WidgetsDependencies.cmake:45 (_qt_internal_find_qt_dependencies)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Widgets/Qt6WidgetsConfig.cmake:53 (include)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/Qt6Config.cmake:245 (find_package)"
+      - "qt6_ui/CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Performing Test HAVE_EGL"
+    directories:
+      source: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-YNsEIV"
+      binary: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-YNsEIV"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -O2 -pipe -g -feliminate-unused-debug-types "
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now"
+      CMAKE_MODULE_PATH: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/extra-cmake-modules/find-modules;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/kwin"
+      CMAKE_SYSROOT: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux"
+    buildResult:
+      variable: "HAVE_EGL"
+      cached: true
+      stdout: |
+        Change Dir: '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-YNsEIV'
+        
+        Run Build Command(s): /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_5d2af/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_5d2af.dir/build.make CMakeFiles/cmTC_5d2af.dir/build
+        gmake[1]: Entering directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-YNsEIV'
+        Building CXX object CMakeFiles/cmTC_5d2af.dir/src.cxx.o
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux -DHAVE_EGL  -O2 -pipe -g -feliminate-unused-debug-types   -std=gnu++17 -o CMakeFiles/cmTC_5d2af.dir/src.cxx.o -c /home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-YNsEIV/src.cxx
+        Linking CXX executable cmTC_5d2af
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_5d2af.dir/link.txt --verbose=1
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux  -O2 -pipe -g -feliminate-unused-debug-types   -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now  CMakeFiles/cmTC_5d2af.dir/src.cxx.o -o cmTC_5d2af  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/libEGL.so 
+        gmake[1]: Leaving directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-YNsEIV'
+        
+      exitCode: 0
+  -
+    kind: "try_compile-v1"
+    backtrace:
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/Internal/CheckSourceCompiles.cmake:101 (try_compile)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CheckCXXSourceCompiles.cmake:52 (cmake_check_source_compiles)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/FindGLESv2.cmake:28 (check_cxx_source_compiles)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:36 (find_dependency)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Gui/Qt6GuiDependencies.cmake:36 (_qt_internal_find_third_party_dependencies)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Gui/Qt6GuiConfig.cmake:53 (include)"
+      - "/opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/share/cmake-3.28/Modules/CMakeFindDependencyMacro.cmake:76 (find_package)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/QtPublicDependencyHelpers.cmake:142 (find_dependency)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Widgets/Qt6WidgetsDependencies.cmake:45 (_qt_internal_find_qt_dependencies)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6Widgets/Qt6WidgetsConfig.cmake:53 (include)"
+      - "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/Qt6Config.cmake:245 (find_package)"
+      - "qt6_ui/CMakeLists.txt:8 (find_package)"
+    checks:
+      - "Performing Test HAVE_GLESv2"
+    directories:
+      source: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-keAm6B"
+      binary: "/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-keAm6B"
+    cmakeVariables:
+      CMAKE_CXX_FLAGS: " -O2 -pipe -g -feliminate-unused-debug-types "
+      CMAKE_CXX_FLAGS_DEBUG: "-g"
+      CMAKE_EXE_LINKER_FLAGS: "-Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now"
+      CMAKE_MODULE_PATH: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/extra-cmake-modules/find-modules;/opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/cmake/Qt6/3rdparty/kwin"
+      CMAKE_SYSROOT: "/opt/poky/5.0.18/sysroots/cortexa72-poky-linux"
+    buildResult:
+      variable: "HAVE_GLESv2"
+      cached: true
+      stdout: |
+        Change Dir: '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-keAm6B'
+        
+        Run Build Command(s): /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E env VERBOSE=1 /usr/bin/gmake -f Makefile cmTC_08965/fast
+        /usr/bin/gmake  -f CMakeFiles/cmTC_08965.dir/build.make CMakeFiles/cmTC_08965.dir/build
+        gmake[1]: Entering directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-keAm6B'
+        Building CXX object CMakeFiles/cmTC_08965.dir/src.cxx.o
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux -DHAVE_GLESv2  -O2 -pipe -g -feliminate-unused-debug-types   -std=gnu++17 -o CMakeFiles/cmTC_08965.dir/src.cxx.o -c /home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-keAm6B/src.cxx
+        Linking CXX executable cmTC_08965
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/cmake -E cmake_link_script CMakeFiles/cmTC_08965.dir/link.txt --verbose=1
+        /opt/poky/5.0.18/sysroots/x86_64-pokysdk-linux/usr/bin/aarch64-poky-linux/aarch64-poky-linux-g++   -mcpu=cortex-a72+crc -mbranch-protection=standard -fstack-protector-strong  -O2 -D_FORTIFY_SOURCE=2 -Wformat -Wformat-security -Werror=format-security --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux --sysroot=/opt/poky/5.0.18/sysroots/cortexa72-poky-linux  -O2 -pipe -g -feliminate-unused-debug-types   -Wl,-O1 -Wl,--hash-style=gnu -Wl,--as-needed  -Wl,-z,relro,-z,now  CMakeFiles/cmTC_08965.dir/src.cxx.o -o cmTC_08965  /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/libGLESv2.so /opt/poky/5.0.18/sysroots/cortexa72-poky-linux/usr/lib/libEGL.so 
+        gmake[1]: Leaving directory '/home/ssinsaram2/telechips-project-qt6/build-rpi4-yocto/CMakeFiles/CMakeScratch/TryCompile-keAm6B'
+        
+      exitCode: 0
+...

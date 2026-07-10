@@ -1,0 +1,22 @@
+Start testing: Jul 10 11:03 KST
+----------------------------------------------------------
+1/1 Testing: vehicle_state_machine_self_test
+1/1 Test: vehicle_state_machine_self_test
+Command: "/home/ssinsaram2/telechips-project-qt6/build/telechips_project_qt6" "--self-test"
+Directory: /home/ssinsaram2/telechips-project-qt6/build
+"vehicle_state_machine_self_test" start time: Jul 10 11:03 KST
+Output:
+----------------------------------------------------------
+PASS: vehicle UI state machine validated
+Transitions: IGNITION_OFF --power--> DRIVER_AUTH --face success/PIN success--> WAIT_IGNITION --power--> OPERATIONAL
+Blocked flow: DRIVER_AUTH --face failure--> PIN_LOGIN --3 failures--> BLOCKED 관리자에게 문의 하시오
+Attached table flow: OPERATIONAL --승하차--> PASSENGER_TRANSFER --승하차--> OPERATIONAL, OPERATIONAL --power--> IGNITION_OFF
+<end of output>
+Test time =   0.01 sec
+----------------------------------------------------------
+Test Passed.
+"vehicle_state_machine_self_test" end time: Jul 10 11:03 KST
+"vehicle_state_machine_self_test" time elapsed: 00:00:00
+----------------------------------------------------------
+
+End testing: Jul 10 11:03 KST
