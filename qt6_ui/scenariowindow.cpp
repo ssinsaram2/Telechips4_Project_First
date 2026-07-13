@@ -606,7 +606,9 @@ void ScenarioWindow::submitPin()
         qInfo() << "[pin] PIN accepted";
         m_activePinCode.clear();
         m_pinFailCount = 0;
-        emit faceSuccessTestRequested(1);
+        // PIN 인증은 얼굴 인증과 구분해서 Central로 보낸다.
+        // Central은 이 신호를 받은 뒤에만 driver_profile.json 개인화를 적용한다.
+        emit pinAuthSucceeded(1);
         return;
     }
 

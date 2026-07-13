@@ -78,6 +78,8 @@ int main(int argc, char *argv[])
                      &client, &CentralClient::sendAlarmAck);
     QObject::connect(&window, &ScenarioWindow::faceSuccessTestRequested,
                      &client, &CentralClient::sendFaceSuccess);
+    QObject::connect(&window, &ScenarioWindow::pinAuthSucceeded,
+                     &client, &CentralClient::sendPinSuccess);
     QObject::connect(&window, &ScenarioWindow::faceFailTestRequested,
                      &client, &CentralClient::sendFaceFail);
 

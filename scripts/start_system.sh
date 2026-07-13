@@ -11,7 +11,7 @@
 #   CHILD_ALERT_LEVEL1_CMD="/opt/central/send_child_alert_telegram.sh driver"
 #   CHILD_ALERT_LEVEL2_CMD="/opt/central/send_child_alert_telegram.sh police"
 #   TELEGRAM_BOT_TOKEN, TELEGRAM_CHAT_ID_DRIVER, TELEGRAM_CHAT_ID_POLICE
-#   level2 기본값은 repo의 send_child_alert_telegram.sh police이며 police.txt를 읽는다.
+#   level2 기본값은 /root/send_child_alert_telegram.sh police가 있으면 이를 우선 사용한다.
 #
 #   [MOD] 타이머 (실설계값 / 시연 단축)
 #   CHILD_ALERT_ESCALATION_SEC     90  (1차→2차, 시연 15~30)
@@ -36,7 +36,13 @@ if [ ! -x "$CENTRAL_APP_PATH" ]; then
     echo "[start] $CENTRAL_APP_PATH 없음 — CENTRAL_APP_PATH를 확인하세요." >&2
     exit 1
 fi
-export CHILD_ALERT_LEVEL2_CMD="${CHILD_ALERT_LEVEL2_CMD:-$DIR/../rpi4_central/scripts/send_child_alert_telegram.sh police}"
+if [ -z "${CHILD_ALERT_LEVEL2_CMD:-}" ]; then
+    if [ -x /root/send_child_alert_telegram.sh ]; then
+        export CHILD_ALERT_LEVEL2_CMD="/root/send_child_alert_telegram.sh police"
+    else
+        export CHILD_ALERT_LEVEL2_CMD="$DIR/../rpi4_central/scripts/send_child_alert_telegram.sh police"
+    fi
+fi
 nohup "$CENTRAL_APP_PATH" >>"$LOG_DIR/central.log" 2>&1 &
 sleep 0.5
 if ! pidof central_app >/dev/null; then

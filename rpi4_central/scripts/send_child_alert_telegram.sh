@@ -71,6 +71,7 @@ load_config() {
         "$SCRIPT_DIR/$default_name" \
         "$SCRIPT_DIR/../$default_name" \
         "$SCRIPT_DIR/../../$default_name" \
+        "/root/$default_name" \
         "/opt/central/$default_name"
     do
         [ -n "$path" ] || continue

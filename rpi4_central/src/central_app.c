@@ -115,6 +115,20 @@
 #define MAX_OBJECT_CAMERA_PER_LOOP 16
 #define DEFAULT_OBJECT_CAMERA_PORT 5010U
 
+/*
+ * [MOD] 운전자 개인화 프로필 파일 규약.
+ * seatPosition은 F/W 좌석 모터 PWM duty로 쓰이므로 0~100으로 제한하고,
+ * temperature는 운전자 선호 실내 목표 온도(°C)로 쓰이므로 차량 공조에서
+ * 의미 있는 범위만 허용한다. 범위를 벗어난 값은 fail-safe로 clamp한다.
+ */
+#define DRIVER_PROFILE_JSON_MAX_BYTES 8192U
+#define DRIVER_PROFILE_DEFAULT_SEAT_POSITION 40U
+#define DRIVER_PROFILE_DEFAULT_TEMPERATURE_C 25U
+#define DRIVER_PROFILE_SEAT_MIN 0U
+#define DRIVER_PROFILE_SEAT_MAX 100U
+#define DRIVER_PROFILE_TEMPERATURE_MIN_C 16U
+#define DRIVER_PROFILE_TEMPERATURE_MAX_C 30U
+
 typedef enum
 {
     STATE_IGNITION_OFF = 0,
@@ -138,6 +152,13 @@ typedef struct
     uint8_t data[8];
 } CanMessage;
 
+typedef enum
+{
+    PROFILE_LOAD_UNREADABLE = 0,
+    PROFILE_LOAD_NO_MATCH,
+    PROFILE_LOAD_MATCH
+} ProfileLoadResult;
+
 static volatile sig_atomic_t g_running = 1;
 static int g_canSocket = -1;
 static int g_objectCameraSocket = -1;
@@ -147,6 +168,8 @@ static mqd_t g_mqQtToCentral = (mqd_t)-1;
 static SystemState g_state = STATE_IGNITION_OFF;
 static DriverProfile g_profile = {1U, 40U, 25U};
 static bool g_hasProfile = false;
+static bool g_driverAuthenticated = false;
+static const char *g_driverAuthMethod = "none";
 
 static uint32_t g_currentSeatbeltBitmap = 0U;
 static uint32_t g_referenceSeatbeltBitmap = 0U;
@@ -983,8 +1006,374 @@ static void handle_seatbelt_bitmap(uint32_t bitmap)
     send_seatbelt_ui();
 }
 
+static const char *skip_json_ws(const char *p, const char *end)
+{
+    while (p < end &&
+           (*p == ' ' || *p == '\t' || *p == '\r' || *p == '\n'))
+    {
+        p++;
+    }
+    return p;
+}
+
+static const char *find_literal_between(const char *begin, const char *end, const char *literal)
+{
+    const char *p = begin;
+    size_t len = strlen(literal);
+
+    while (p != NULL && p + len <= end)
+    {
+        p = strstr(p, literal);
+        if (p == NULL || p + len > end)
+        {
+            return NULL;
+        }
+        return p;
+    }
+
+    return NULL;
+}
+
+static const char *find_char_between(const char *begin, const char *end, char target)
+{
+    const char *p;
+
+    for (p = begin; p < end; p++)
+    {
+        if (*p == target)
+        {
+            return p;
+        }
+    }
+
+    return NULL;
+}
+
+static const char *find_json_pair_end(const char *open, char openCh, char closeCh)
+{
+    const char *p;
+    bool inString = false;
+    bool escaped = false;
+    int depth = 0;
+
+    /*
+     * JSON 배열/객체 범위를 찾을 때 문자열 내부의 괄호는 무시한다.
+     * driver_profile.json은 단순한 스키마지만, 이 정도 처리는 해 두어야
+     * 포맷팅이나 문자열 값 추가로 경계 탐색이 깨지지 않는다.
+     */
+    for (p = open; *p != '\0'; p++)
+    {
+        if (inString)
+        {
+            if (escaped)
+            {
+                escaped = false;
+            }
+            else if (*p == '\\')
+            {
+                escaped = true;
+            }
+            else if (*p == '"')
+            {
+                inString = false;
+            }
+            continue;
+        }
+
+        if (*p == '"')
+        {
+            inString = true;
+        }
+        else if (*p == openCh)
+        {
+            depth++;
+        }
+        else if (*p == closeCh)
+        {
+            depth--;
+            if (depth == 0)
+            {
+                return p;
+            }
+        }
+    }
+
+    return NULL;
+}
+
+static bool parse_json_u32_field(const char *begin, const char *end,
+                                 const char *key, uint32_t *value)
+{
+    char pattern[64];
+    const char *keyPos;
+    const char *colon;
+    const char *number;
+    char *parseEnd = NULL;
+    unsigned long parsed;
+
+    if (snprintf(pattern, sizeof(pattern), "\"%s\"", key) >= (int)sizeof(pattern))
+    {
+        return false;
+    }
+
+    keyPos = find_literal_between(begin, end, pattern);
+    if (keyPos == NULL)
+    {
+        return false;
+    }
+
+    colon = find_char_between(keyPos + strlen(pattern), end, ':');
+    if (colon == NULL)
+    {
+        return false;
+    }
+
+    number = skip_json_ws(colon + 1, end);
+    if (number >= end || *number < '0' || *number > '9')
+    {
+        return false;
+    }
+
+    parsed = strtoul(number, &parseEnd, 10);
+    if (parseEnd == number || parseEnd > end || parsed > 4294967295UL)
+    {
+        return false;
+    }
+
+    if (value != NULL)
+    {
+        *value = (uint32_t)parsed;
+    }
+    return true;
+}
+
+static uint8_t clamp_profile_value(const char *field, uint32_t value,
+                                   uint32_t minValue, uint32_t maxValue)
+{
+    uint32_t clamped = value;
+
+    if (clamped < minValue)
+    {
+        printf("[central] profile %s=%u below min %u; clamp\n",
+               field, value, minValue);
+        clamped = minValue;
+    }
+    else if (clamped > maxValue)
+    {
+        printf("[central] profile %s=%u above max %u; clamp\n",
+               field, value, maxValue);
+        clamped = maxValue;
+    }
+
+    return (uint8_t)clamped;
+}
+
+static bool parse_driver_profile_json(const char *json, uint32_t driverId,
+                                      DriverProfile *profile)
+{
+    const char *jsonEnd = json + strlen(json);
+    const char *driversKey;
+    const char *arrayStart;
+    const char *arrayEnd;
+    const char *cursor;
+
+    /*
+     * 이 파서는 driver_profile.json의 고정 스키마만 읽는다.
+     * 필요한 필드는 drivers[].driverId, seatPosition, temperature뿐이며,
+     * 범용 JSON 처리가 필요해지면 별도 라이브러리(jansson/cJSON 등)로
+     * 교체하는 것이 맞다.
+     */
+    driversKey = find_literal_between(json, jsonEnd, "\"drivers\"");
+    if (driversKey == NULL)
+    {
+        return false;
+    }
+
+    arrayStart = find_char_between(driversKey, jsonEnd, '[');
+    if (arrayStart == NULL)
+    {
+        return false;
+    }
+
+    arrayEnd = find_json_pair_end(arrayStart, '[', ']');
+    if (arrayEnd == NULL)
+    {
+        return false;
+    }
+
+    cursor = arrayStart + 1;
+    while (cursor < arrayEnd)
+    {
+        const char *objectStart = find_char_between(cursor, arrayEnd, '{');
+        const char *objectEnd;
+        uint32_t parsedDriverId;
+        uint32_t parsedSeatPosition;
+        uint32_t parsedTemperature;
+
+        if (objectStart == NULL)
+        {
+            break;
+        }
+
+        objectEnd = find_json_pair_end(objectStart, '{', '}');
+        if (objectEnd == NULL || objectEnd > arrayEnd)
+        {
+            return false;
+        }
+
+        if (parse_json_u32_field(objectStart, objectEnd, "driverId", &parsedDriverId) &&
+            parsedDriverId == driverId)
+        {
+            if (!parse_json_u32_field(objectStart, objectEnd, "seatPosition", &parsedSeatPosition) ||
+                !parse_json_u32_field(objectStart, objectEnd, "temperature", &parsedTemperature))
+            {
+                printf("[central] profile driverId=%u missing seatPosition or temperature\n",
+                       driverId);
+                fflush(stdout);
+                return false;
+            }
+
+            profile->driverId = driverId;
+            profile->seatPosition = clamp_profile_value("seatPosition",
+                                                        parsedSeatPosition,
+                                                        DRIVER_PROFILE_SEAT_MIN,
+                                                        DRIVER_PROFILE_SEAT_MAX);
+            profile->temperatureTarget = clamp_profile_value("temperature",
+                                                             parsedTemperature,
+                                                             DRIVER_PROFILE_TEMPERATURE_MIN_C,
+                                                             DRIVER_PROFILE_TEMPERATURE_MAX_C);
+            return true;
+        }
+
+        cursor = objectEnd + 1;
+    }
+
+    return false;
+}
+
+static ProfileLoadResult try_load_profile_path(const char *path, uint32_t driverId,
+                                               DriverProfile *profile)
+{
+    FILE *file;
+    char json[DRIVER_PROFILE_JSON_MAX_BYTES];
+    size_t received;
+
+    if (path == NULL || path[0] == '\0')
+    {
+        return PROFILE_LOAD_UNREADABLE;
+    }
+
+    file = fopen(path, "rb");
+    if (file == NULL)
+    {
+        return PROFILE_LOAD_UNREADABLE;
+    }
+
+    received = fread(json, 1U, sizeof(json) - 1U, file);
+    if (ferror(file) != 0)
+    {
+        printf("[central] profile read failed: %s\n", path);
+        fclose(file);
+        fflush(stdout);
+        return PROFILE_LOAD_NO_MATCH;
+    }
+    fclose(file);
+
+    json[received] = '\0';
+
+    if (received == sizeof(json) - 1U)
+    {
+        printf("[central] profile file too large: %s\n", path);
+        fflush(stdout);
+        return PROFILE_LOAD_NO_MATCH;
+    }
+
+    if (parse_driver_profile_json(json, driverId, profile))
+    {
+        printf("[central] profile loaded from %s: driverId=%u seat=%u temp=%u\n",
+               path,
+               profile->driverId,
+               profile->seatPosition,
+               profile->temperatureTarget);
+        fflush(stdout);
+        return PROFILE_LOAD_MATCH;
+    }
+
+    printf("[central] profile file has no usable entry for driverId=%u: %s\n",
+           driverId, path);
+    fflush(stdout);
+    return PROFILE_LOAD_NO_MATCH;
+}
+
+static bool load_profile_from_json(uint32_t driverId, DriverProfile *profile)
+{
+    static const char *fallbackPaths[] = {
+        "./driver_profile.json",
+        "driver_profile.json",
+        "/root/driver_profile.json",
+        "/opt/central/driver_profile.json"
+    };
+    const char *configuredPath = getenv("DRIVER_PROFILE_PATH");
+    size_t i;
+
+    /*
+     * DRIVER_PROFILE_PATH가 있으면 운영자가 명시한 파일만 신뢰한다.
+     * 미설정이면 실행 위치가 달라도 동작하도록 자주 쓰는 배포 경로를 순서대로 찾는다.
+     */
+    if (configuredPath != NULL && configuredPath[0] != '\0')
+    {
+        return try_load_profile_path(configuredPath, driverId, profile) == PROFILE_LOAD_MATCH;
+    }
+
+    for (i = 0U; i < sizeof(fallbackPaths) / sizeof(fallbackPaths[0]); i++)
+    {
+        ProfileLoadResult result = try_load_profile_path(fallbackPaths[i], driverId, profile);
+        if (result == PROFILE_LOAD_MATCH)
+        {
+            return true;
+        }
+        if (result == PROFILE_LOAD_NO_MATCH)
+        {
+            return false;
+        }
+    }
+
+    printf("[central] profile file not found; using default profile\n");
+    fflush(stdout);
+    return false;
+}
+
+static void set_default_profile(uint32_t driverId)
+{
+    /*
+     * JSON 파일이 없거나 해당 driverId가 없으면 인증은 유지하되,
+     * 액츄에이터에는 안전한 기본값을 보낸다.
+     */
+    g_profile.driverId = driverId == 0U ? 1U : driverId;
+    g_profile.seatPosition = DRIVER_PROFILE_DEFAULT_SEAT_POSITION;
+    g_profile.temperatureTarget = DRIVER_PROFILE_DEFAULT_TEMPERATURE_C;
+    g_hasProfile = true;
+    printf("[central] default profile selected: driverId=%u seat=%u temp=%u\n",
+           g_profile.driverId,
+           g_profile.seatPosition,
+           g_profile.temperatureTarget);
+    fflush(stdout);
+}
+
 static void apply_profile(void)
 {
+    if (!g_driverAuthenticated)
+    {
+        /*
+         * 개인화 액츄에이터 명령은 인증 완료 이후에만 허용한다.
+         * 얼굴/PIN 인증 전에는 이전 운전자의 g_profile이 남아 있어도
+         * 좌석(0x093)이나 온도(0x073) CAN을 절대 재송신하지 않는다.
+         */
+        printf("[central] profile apply blocked: driver is not authenticated\n");
+        fflush(stdout);
+        return;
+    }
+
     if (!g_hasProfile)
     {
         return;
@@ -998,33 +1387,27 @@ static void apply_profile(void)
             (int32_t)g_profile.seatPosition,
             (int32_t)g_profile.temperatureTarget,
             0);
+    printf("[central] profile applied after %s authentication: driverId=%u seat=%u temp=%u\n",
+           g_driverAuthMethod,
+           g_profile.driverId,
+           g_profile.seatPosition,
+           g_profile.temperatureTarget);
+    fflush(stdout);
 }
 
 static void load_profile(uint32_t driverId)
 {
-    /*
-     * Demo profile table. Replace with JSON loading later if needed.
-     * seatPosition is used as seat motor PWM duty, temperatureTarget is °C.
-     */
-    if (driverId == 2U)
+    DriverProfile loadedProfile;
+    uint32_t normalizedDriverId = driverId == 0U ? 1U : driverId;
+
+    if (load_profile_from_json(normalizedDriverId, &loadedProfile))
     {
-        g_profile.driverId = 2U;
-        g_profile.seatPosition = 45U;
-        g_profile.temperatureTarget = 24U;
+        g_profile = loadedProfile;
+        g_hasProfile = true;
+        return;
     }
-    else if (driverId == 3U)
-    {
-        g_profile.driverId = 3U;
-        g_profile.seatPosition = 35U;
-        g_profile.temperatureTarget = 26U;
-    }
-    else
-    {
-        g_profile.driverId = driverId == 0U ? 1U : driverId;
-        g_profile.seatPosition = 40U;
-        g_profile.temperatureTarget = 25U;
-    }
-    g_hasProfile = true;
+
+    set_default_profile(normalizedDriverId);
 }
 
 static void start_child_monitoring(void)
@@ -1079,19 +1462,69 @@ static bool notify_child_alert_default_script(const char *role, const char *labe
     static const char *paths[] = {
         "rpi4_central/scripts/send_child_alert_telegram.sh",
         "./rpi4_central/scripts/send_child_alert_telegram.sh",
+        "/root/send_child_alert_telegram.sh",
         "/opt/central/send_child_alert_telegram.sh",
         "/opt/central/bin/send_child_alert_telegram.sh",
         "send_child_alert_telegram.sh"
     };
+    char exePath[512];
     char command[512];
+    ssize_t exeLen;
     size_t i;
     int rc;
+
+    exeLen = readlink("/proc/self/exe", exePath, sizeof(exePath) - 1U);
+    if (exeLen > 0)
+    {
+        char *slash;
+        char scriptPath[512];
+
+        exePath[exeLen] = '\0';
+        slash = strrchr(exePath, '/');
+        if (slash != NULL)
+        {
+            *slash = '\0';
+
+            if (snprintf(scriptPath, sizeof(scriptPath),
+                         "%s/send_child_alert_telegram.sh", exePath) < (int)sizeof(scriptPath) &&
+                access(scriptPath, X_OK) == 0 &&
+                snprintf(command, sizeof(command), "%s %s", scriptPath, role) < (int)sizeof(command))
+            {
+                rc = system(command);
+                printf("[central] Telegram %s via executable-dir script (%s) rc=%d\n",
+                       label, scriptPath, rc);
+                fflush(stdout);
+                if (rc == 0)
+                {
+                    return true;
+                }
+            }
+
+            if (snprintf(scriptPath, sizeof(scriptPath),
+                         "%s/../scripts/send_child_alert_telegram.sh", exePath) < (int)sizeof(scriptPath) &&
+                access(scriptPath, X_OK) == 0 &&
+                snprintf(command, sizeof(command), "%s %s", scriptPath, role) < (int)sizeof(command))
+            {
+                rc = system(command);
+                printf("[central] Telegram %s via executable-relative script (%s) rc=%d\n",
+                       label, scriptPath, rc);
+                fflush(stdout);
+                if (rc == 0)
+                {
+                    return true;
+                }
+            }
+        }
+    }
 
     for (i = 0U; i < sizeof(paths) / sizeof(paths[0]); i++)
     {
         if (strcmp(paths[i], "send_child_alert_telegram.sh") != 0 &&
             access(paths[i], X_OK) != 0)
         {
+            printf("[central] Telegram %s candidate skipped (%s): %s\n",
+                   label, paths[i], strerror(errno));
+            fflush(stdout);
             continue;
         }
 
@@ -1104,7 +1537,10 @@ static bool notify_child_alert_default_script(const char *role, const char *labe
         printf("[central] Telegram %s via default script (%s) rc=%d\n",
                label, paths[i], rc);
         fflush(stdout);
-        return true;
+        if (rc == 0)
+        {
+            return true;
+        }
     }
 
     return false;
@@ -1138,6 +1574,12 @@ static void notify_child_alert(const char *env_name, const char *label)
     rc = system(command);
     printf("[central] Telegram %s via %s rc=%d\n", label, env_name, rc);
     fflush(stdout);
+    if (rc != 0 &&
+        strcmp(env_name, "CHILD_ALERT_LEVEL2_CMD") == 0 &&
+        notify_child_alert_default_script("police", label))
+    {
+        return;
+    }
 }
 
 static void start_child_alarm_level1(uint32_t source)
@@ -1395,6 +1837,13 @@ static void enter_driver_auth(void)
     stop_child_monitoring();
 
     g_state = STATE_DRIVER_AUTH;
+    /*
+     * 새 인증 세션이 시작되면 이전 운전자의 개인화 상태를 폐기한다.
+     * 이후 얼굴 인증 또는 PIN 인증 성공 IPC가 도착해야만 다시 profile apply가 가능하다.
+     */
+    g_driverAuthenticated = false;
+    g_driverAuthMethod = "none";
+    g_hasProfile = false;
 
     /* [MOD] 로그인/운전자 인증 화면: RPi5는 얼굴 감지/인증 모델(1)을 사용한다. */
     rpi5_send_ai_model(AI_MODEL_FACE_AUTH);
@@ -1405,10 +1854,18 @@ static void enter_driver_auth(void)
     send_ui(IPC_MSG_SHOW_AUTH_SCREEN, 0, 0, 0, 0);
 }
 
-static void enter_wait_ignition(uint32_t driverId)
+static void enter_wait_ignition(uint32_t driverId, const char *authMethod)
 {
     g_state = STATE_WAIT_IGNITION;
-    printf("[central] state -> WAIT_IGNITION (driverId=%u)\n", driverId); /* [MOD] log */
+    /*
+     * 이 함수는 인증 성공 경로에서만 호출된다.
+     * 이 플래그가 true가 된 뒤에 load_profile/apply_profile을 수행해야
+     * 개인화가 얼굴/PIN 인증 완료 이후에만 액츄에이터로 나간다.
+     */
+    g_driverAuthenticated = true;
+    g_driverAuthMethod = (authMethod != NULL && authMethod[0] != '\0') ? authMethod : "unknown";
+    printf("[central] state -> WAIT_IGNITION (driverId=%u, auth=%s)\n",
+           driverId, g_driverAuthMethod); /* [MOD] log */
     load_profile(driverId);
     /* [MOD] 인증 완료 후 시동 ON 대기 화면: 얼굴 인증이 끝났으므로 AI 모델을 끈다(0). */
     rpi5_send_ai_model(AI_MODEL_NONE);
@@ -1476,6 +1933,9 @@ static void enter_ignition_off_from_drive(void)
     g_referenceSeatbeltBitmap = 0U;
     g_currentSeatbeltBitmap = 0U;
     g_seatbeltAlarmActive = false;
+    g_driverAuthenticated = false;
+    g_driverAuthMethod = "none";
+    g_hasProfile = false;
     update_buzzer();
     send_ignition_operation(IGNITION_OFF, OP_PARKING);
     send_ui(IPC_MSG_SCREEN_OFF, 1, 0, 0, 0);
@@ -1542,10 +2002,28 @@ static void process_ipc_message(const IpcMessage *msg)
             break;
 
         case IPC_MSG_DRIVER_ID_RECEIVED:
+            if (g_state == STATE_DRIVER_AUTH)
+            {
+                enter_wait_ignition((uint32_t)msg->data[0], "pin");
+            }
+            else
+            {
+                printf("[central] PIN auth success ignored outside auth state: state=%d\n",
+                       (int)g_state);
+                fflush(stdout);
+            }
+            break;
+
         case IPC_MSG_FACE_AUTH_SUCCESS:
             if (g_state == STATE_DRIVER_AUTH)
             {
-                enter_wait_ignition((uint32_t)msg->data[0]);
+                enter_wait_ignition((uint32_t)msg->data[0], "face");
+            }
+            else
+            {
+                printf("[central] face auth success ignored outside auth state: state=%d\n",
+                       (int)g_state);
+                fflush(stdout);
             }
             break;
 

@@ -24,6 +24,7 @@ signals:
     void alarmAckClicked();
     void faceSuccessTestRequested(int driverId);
     void faceFailTestRequested();
+    void pinAuthSucceeded(int driverId);
 
 public slots:
     void showBlackScreen(bool residualTransition);

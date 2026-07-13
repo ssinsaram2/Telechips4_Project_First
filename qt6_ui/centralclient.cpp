@@ -189,6 +189,16 @@ void CentralClient::sendFaceSuccess(int driverId)
     sendMessage(IPC_MSG_FACE_AUTH_SUCCESS, driverId);
 }
 
+void CentralClient::sendPinSuccess(int driverId)
+{
+    if (driverId <= 0)
+        driverId = 1;
+
+    // PIN 대체 인증 성공도 인증 완료 이후 개인화가 적용되어야 하므로
+    // Central의 인증 완료 IPC 경로로 driverId를 전달한다.
+    sendMessage(IPC_MSG_DRIVER_ID_RECEIVED, driverId);
+}
+
 void CentralClient::sendFaceFail()
 {
     sendMessage(IPC_MSG_FACE_AUTH_FAIL);

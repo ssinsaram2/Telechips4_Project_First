@@ -25,6 +25,7 @@ public slots:
     void sendBoardingButton();
     void sendAlarmAck();
     void sendFaceSuccess(int driverId);
+    void sendPinSuccess(int driverId);
     void sendFaceFail();
 
 signals:
