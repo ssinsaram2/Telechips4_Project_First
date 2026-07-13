@@ -44,12 +44,59 @@
 #define IGNITION_DISPLAY 1U
 #define IGNITION_ON 2U
 
-#define OP_PARKING 0U
-#define OP_RUNNING 1U
-#define OP_ALARM   2U
+/*
+ * [MOD] 0x083 data[1] 운행 상태 정의 — RPi4/RTOS/F/W 3보드 공통 규약 (canonical).
+ *   0 = OP_PARKING  : 시동 OFF / 주차 (잔류 감시 대기 포함)
+ *   1 = OP_RUNNING  : 운행 중 (OPERATIONAL)
+ *   2 = OP_ALARM    : 잔류 감지 경보 활성 (RPi4가 확정한 경우에만 송신)
+ *   3 = (reserved)
+ *   4 = OP_BOARDING : 승하차 중 (PASSENGER_TRANSFER)
+ * F/W fw_common.h의 OperationState_t, RTOS main.c의 op 분기와 반드시 일치해야 한다.
+ */
+#define OP_PARKING  0U
+#define OP_RUNNING  1U
+#define OP_ALARM    2U
+#define OP_BOARDING 4U
 
+/*
+ * [MOD] 30초 Telegram 에스컬레이션 상수 (요구사항 18-14).
+ * 테스트 시 환경변수 CHILD_ALERT_ESCALATION_SEC로 짧게(예: 5) 조절 가능.
+ */
 #define CHILD_ALERT_DEFAULT_ESCALATION_SEC 30U
-#define CHILD_MONITOR_DEFAULT_DURATION_SEC 1200U
+/*
+ * [MOD-이력] 무감지 20분 자동 종료 로직은 폐기됨 (2026-07-13).
+ * 감시 세션 종료는 central_tick()의 내부 타이머가 아니라
+ * enter_driver_auth() / enter_operational_from_wait() —
+ * 즉 "다음 운행 시작"에서만 발생한다 (Euro NCAP CPD §3.3.6.1.3과 동일 경계).
+ * 이유: 통학버스는 정차 시간이 길고, 정확히 무감지 구간 이후에 아동이
+ * 스스로 탑승하는 경우(CPD Scenario 3, §8.5.3)를 놓치면 안 되기 때문.
+ */
+/* [MOD] 경고 해제 직후 재감지 무시 시간 — PIR이 계속 true여도 이 시간 동안은
+ * 새 경고를 latch하지 않는다 (요구사항 9-12 권장 정책). */
+/*
+ * [MOD] 해제 버튼 = "차량 확인 완료" (2026-07-12 최종 확정).
+ * 근거: Euro NCAP CPD Protocol v1.2 §4.3.8 — 에스컬레이션 경고 취소 후
+ * 90초 뒤 재확인하여, 아동이 여전히 감지되고 차량이 잠겨 있으면 문이
+ * 열리거나 개입이 시작될 때까지 새 경고 사이클을 반복해야 한다.
+ * 즉 경고 해제 ≠ 감지 기능 OFF. 해제는 현재 경고 사건의 처리 완료만
+ * 의미하며 감시는 유지되고, 유예(재확인 주기) 후 감지가 지속/재발하면
+ * 새 1차 경고부터 다시 시작한다.
+ * 실설계값 90초(§4.3.8), 시연 기본 30초 — 타이머 상수 치환 원칙.
+ * 환경변수 CHILD_ACK_COOLDOWN_SEC로 조절 (시연 단축 시 10 권장).
+ * (센서 안정화 대기 조건은 채택하지 않음 — 아동이 계속 감지되는 최악
+ *  케이스에서 영구 침묵하는 결함이 있고 §4.3.8에도 반함)
+ */
+#define CHILD_ACK_COOLDOWN_DEFAULT_SEC   30U
+/* [MOD] can0가 늦게 올라온 경우 소켓 재시도 주기 */
+#define CAN_RETRY_INTERVAL_SEC             2U
+/*
+ * [MOD] 잔류 감지 모드 F/W 제어 기준값 (로그/판단 표시용).
+ * 실제 팬/LED 실행 판단은 F/W(fw_control.c)가 동일 기준으로 수행한다:
+ *   FAN_PARK_TEMP_L1/L2/L3 = 25.0/28.0/30.0°C, LIGHT_THRESHOLD = 700.0 lux
+ * 값을 바꿀 때는 F/W fw_common.h / fw_control.c와 함께 바꿀 것.
+ */
+#define ROA_FAN_TEMP_THRESHOLD_X10   250   /* 25.0°C 이상이면 팬 가동 시작 */
+#define ROA_LED_LUX_THRESHOLD_X10   7000   /* 700.0 lux 미만이면 내부 LED ON */
 #define CHILD_SENSOR_PIR 1U
 #define CHILD_SENSOR_CAMERA 2U
 #define ACTIVE_SEAT_MASK 0x03U
@@ -95,15 +142,50 @@ static uint32_t g_referenceSeatbeltBitmap = 0U;
 static bool g_seatbeltAlarmActive = false;
 
 static bool g_childMonitoringActive = false;
-static uint64_t g_childMonitoringStartedSec = 0U;
-static uint32_t g_childMonitoringDurationSec = CHILD_MONITOR_DEFAULT_DURATION_SEC;
+/* (g_childMonitoringStartedSec / g_childMonitoringDurationSec 제거됨 —
+ * 감시는 다음 운행 시작까지 계속되며 내부 타이머로 종료되지 않는다) */
 static bool g_childAlarmLatched = false;
 static bool g_childLevel2Sent = false;
 static uint64_t g_childAlarmStartedSec = 0U;
 static uint32_t g_childAlertEscalationSec = CHILD_ALERT_DEFAULT_ESCALATION_SEC;
 
+/*
+ * [MOD-이력] g_childEverEscalated(재감지 시 2차부터 재개) 제거됨.
+ * 확정 정책: 확인 버튼 → ACK 쿨다운 → 재감지 시 항상 "1차 경고부터" 재시작.
+ * (1차 = 운전자 Telegram, 2차 = 경찰 Telegram)
+ */
+
+/*
+ * [MOD-이력] 2차 경고 반복 발송(1분마다 20분간, CPD §4.3.4.2) 제거됨.
+ * 확정 정책: 운전자 1회(1차) + 경찰 1회(2차) 발송으로 끝낸다.
+ * 경고 장치(부저/외부LED/창문/팬/LED)는 확인 버튼 전까지 계속 유지되므로
+ * "경고 지속" 요구 자체는 만족하고, Telegram 메시지만 1회씩 보낸다.
+ */
+
 static bool g_pirDetected = false;
 static bool g_cameraDetected = false;
+
+/* [MOD] 잔류 감지 재무장(re-arm) 억제: 해제 직후 잠깐은 새 경고를 latch하지 않음 */
+/* [MOD] ACK cooldown: 확인 완료 후 이 시각까지는 새 경고를 latch하지 않는다.
+ * 감시(monitoring)는 계속 살아 있으며, 유예 만료 후 감지가 지속/재발하면
+ * 새 1차 경고가 발생한다. */
+static uint32_t g_childAckCooldownSec = CHILD_ACK_COOLDOWN_DEFAULT_SEC;
+static uint64_t g_childAckCooldownUntilSec = 0U;
+
+/* [MOD] 마지막으로 수신한 환경 센서값 캐시 (0x041) — 잔류 경보 시 판단 로그용 */
+static int16_t  g_lastTempX10 = 0;
+static uint16_t g_lastLuxX10 = 0U;
+static uint8_t  g_lastEnvValid = 0U;
+
+/* [MOD] can0가 늦게 올라오는 경우를 위한 재시도 타임스탬프 */
+static uint64_t g_canLastInitTrySec = 0U;
+
+/* [MOD] 중복 실행 방지 PID 파일 */
+#define CENTRAL_PID_FILE_DEFAULT "/tmp/central_app.pid"
+static int g_pidFileFd = -1;
+
+/* [MOD] CAN 원시 프레임 디버그 로그 (CAN_DEBUG_LOG=1 일 때) */
+static bool g_canDebugLog = false;
 
 
 static const char *queue_name(const char *envName, const char *defaultName)
@@ -165,6 +247,101 @@ static void handle_signal(int signum)
     g_running = 0;
 }
 
+/* [MOD] 상태 이름 로그 헬퍼 (요구사항 13 테스트 로그) */
+static const char *state_name(SystemState s)
+{
+    switch (s)
+    {
+        case STATE_IGNITION_OFF:       return "IGNITION_OFF";
+        case STATE_DRIVER_AUTH:        return "DRIVER_AUTH";
+        case STATE_WAIT_IGNITION:      return "WAIT_IGNITION";
+        case STATE_OPERATIONAL:        return "OPERATIONAL";
+        case STATE_PASSENGER_TRANSFER: return "PASSENGER_TRANSFER";
+        default:                       return "UNKNOWN";
+    }
+}
+
+/*
+ * [MOD] 중복 실행 방지: PID 파일을 O_EXCL로 생성한다.
+ * 이미 존재하면 기록된 PID가 살아 있는지 kill(pid, 0)로 확인하고,
+ * 죽은 프로세스의 잔여 파일이면 지우고 다시 시도한다 (stale pid file 처리).
+ */
+static bool pid_file_acquire(void)
+{
+    const char *path = getenv("CENTRAL_PID_FILE");
+    char buf[32];
+    int len;
+
+    if (path == NULL || path[0] == '\0')
+    {
+        path = CENTRAL_PID_FILE_DEFAULT;
+    }
+
+    for (int attempt = 0; attempt < 2; attempt++)
+    {
+        g_pidFileFd = open(path, O_CREAT | O_EXCL | O_WRONLY, 0644);
+        if (g_pidFileFd >= 0)
+        {
+            len = snprintf(buf, sizeof(buf), "%ld\n", (long)getpid());
+            if (len > 0)
+            {
+                (void)!write(g_pidFileFd, buf, (size_t)len);
+            }
+            return true;
+        }
+
+        if (errno != EEXIST)
+        {
+            perror("[central] pid file open");
+            return true; /* 파일 시스템 문제로 실행 자체를 막지는 않는다 */
+        }
+
+        /* 기존 파일이 있음 → PID가 살아 있는지 확인 */
+        {
+            FILE *fp = fopen(path, "r");
+            long oldPid = 0;
+            if (fp != NULL)
+            {
+                if (fscanf(fp, "%ld", &oldPid) != 1)
+                {
+                    oldPid = 0;
+                }
+                fclose(fp);
+            }
+
+            if (oldPid > 0 && kill((pid_t)oldPid, 0) == 0)
+            {
+                fprintf(stderr,
+                        "[central] already running (pid=%ld, pidfile=%s). "
+                        "stop_system.sh로 종료 후 재실행하세요.\n",
+                        oldPid, path);
+                return false;
+            }
+
+            /* stale pid file → 삭제 후 재시도 */
+            printf("[central] removing stale pid file %s (pid=%ld dead)\n", path, oldPid);
+            unlink(path);
+        }
+    }
+
+    return true;
+}
+
+static void pid_file_release(void)
+{
+    const char *path = getenv("CENTRAL_PID_FILE");
+    if (path == NULL || path[0] == '\0')
+    {
+        path = CENTRAL_PID_FILE_DEFAULT;
+    }
+    if (g_pidFileFd >= 0)
+    {
+        close(g_pidFileFd);
+        g_pidFileFd = -1;
+        unlink(path);
+    }
+}
+
 static int set_nonblock(int fd)
 {
     int flags = fcntl(fd, F_GETFL, 0);
@@ -201,6 +378,31 @@ static bool ipc_init(void)
         return false;
     }
 
+    /*
+     * [MOD] 시작 시 잔여 메시지 배출(drain).
+     * 이전 실행이 비정상 종료되면 mqueue 커널 객체에 옛 메시지가 남아
+     * 다음 실행의 초기 상태를 오염시킨다 (예: 부팅하자마자 오래된 버튼 이벤트 처리).
+     * unlink 대신 drain을 쓰는 이유: UI가 이미 큐 디스크립터를 잡고 있는 상태에서
+     * unlink+재생성하면 UI는 고아가 된 옛 큐를 계속 보게 되어
+     * "보내는데 화면이 안 바뀌는" 문제가 재발한다.
+     */
+    {
+        IpcMessage drainMsg;
+        int drained = 0;
+        while (mq_receive(g_mqQtToCentral, (char *)&drainMsg, sizeof(drainMsg), NULL) > 0)
+        {
+            drained++;
+        }
+        while (mq_receive(g_mqCentralToQt, (char *)&drainMsg, sizeof(drainMsg), NULL) > 0)
+        {
+            drained++;
+        }
+        if (drained > 0)
+        {
+            printf("[central] drained %d stale IPC message(s)\n", drained);
+        }
+    }
+
     printf("[central] IPC ready: %s / %s\n", centralToQtName, qtToCentralName);
     return true;
 }
@@ -216,6 +418,21 @@ static void ipc_close(void)
     {
         mq_close(g_mqQtToCentral);
         g_mqQtToCentral = (mqd_t)-1;
+    }
+
+    /*
+     * [MOD] 정상 종료 시 큐 소유자(central)가 unlink까지 수행한다.
+     * CENTRAL_KEEP_QUEUES=1이면 unlink를 생략 (UI를 계속 띄워둔 채
+     * central만 재시작하는 개발 상황용).
+     */
+    {
+        const char *keep = getenv("CENTRAL_KEEP_QUEUES");
+        if (keep == NULL || strcmp(keep, "1") != 0)
+        {
+            mq_unlink(queue_name(IPC_CENTRAL_TO_QT_QUEUE_ENV, IPC_CENTRAL_TO_QT_QUEUE_DEFAULT));
+            mq_unlink(queue_name(IPC_QT_TO_CENTRAL_QUEUE_ENV, IPC_QT_TO_CENTRAL_QUEUE_DEFAULT));
+            printf("[central] IPC queues unlinked\n");
+        }
     }
 }
 
@@ -737,11 +954,11 @@ static void load_profile(uint32_t driverId)
 static void start_child_monitoring(void)
 {
     g_childMonitoringActive = true;
-    g_childMonitoringStartedSec = monotonic_seconds();
     g_childAlarmLatched = false;
     g_childLevel2Sent = false;
     g_pirDetected = false;
     g_cameraDetected = false;
+    g_childAckCooldownUntilSec = 0U; /* [MOD] 새 세션은 이전 cooldown을 승계하지 않는다 */
     rpi5_send("FACE_OFF");
     rpi5_send("OBJECT_ON");
     printf("[central] residual child monitoring started\n");
@@ -753,6 +970,17 @@ static void stop_child_monitoring(void)
     {
         printf("[central] residual child monitoring stopped\n");
     }
+
+    /*
+     * [MOD] 경보가 latch된 채로 감시를 끝내는 경로(예: 경보 중 전원 버튼 →
+     * DRIVER_AUTH 진입)에서 F/W의 안전 latch(팬/내부 LED)가 남지 않도록
+     * OP_ALARM 해제를 명시적으로 브로드캐스트한다.
+     */
+    if (g_childAlarmLatched)
+    {
+        send_ignition_operation(IGNITION_OFF, OP_PARKING);
+    }
+
     g_childMonitoringActive = false;
     g_childAlarmLatched = false;
     g_childLevel2Sent = false;
@@ -763,6 +991,31 @@ static void stop_child_monitoring(void)
     can_send_onoff(CAN_ID_EXT_LED_CONTROL, false);
     send_window_target(0U);
     update_buzzer();
+}
+
+/*
+ * [MOD] Telegram 발송 공통 헬퍼.
+ * env_name으로 지정된 환경변수의 명령을 실행한다.
+ *   CHILD_ALERT_LEVEL1_CMD : 1차 경고 → 운전자 chat_id
+ *   CHILD_ALERT_LEVEL2_CMD : 2차 경고 → 경찰 chat_id
+ * 두 변수는 서로 다른 스크립트(또는 같은 스크립트 + 다른 TELEGRAM_CHAT_ID)를
+ * 가리켜야 한다. 미설정 시 발송을 건너뛰고 로그만 남긴다(경고 장치는 정상 동작).
+ */
+static void notify_child_alert(const char *env_name, const char *label)
+{
+    const char *command = getenv(env_name);
+    int rc;
+
+    if (command == NULL || command[0] == '\0')
+    {
+        printf("[central] %s unset; Telegram skipped (%s)\n", env_name, label);
+        fflush(stdout);
+        return;
+    }
+
+    rc = system(command);
+    printf("[central] Telegram %s via %s rc=%d\n", label, env_name, rc);
+    fflush(stdout);
 }
 
 static void start_child_alarm_level1(uint32_t source)
@@ -782,19 +1035,46 @@ static void start_child_alarm_level1(uint32_t source)
     g_childLevel2Sent = false;
     g_childAlarmStartedSec = monotonic_seconds();
 
+    /*
+     * [MOD] 잔류 감지 확정 → 제어 명령 송신 (RPi4가 유일한 판단 주체).
+     *  - 0x083 [IGNITION_OFF, OP_ALARM] : RTOS는 상태 추종, F/W는 이 명령으로
+     *    안전 latch를 켜고 자체 센서 기준(온도 25/28/30°C, 조도 700lux)으로
+     *    팬 단계 / 내부 LED를 구동한다. (경보 시작/해제 권한은 RPi4에만 있음)
+     *  - 0x0C3 부저 ON, 0x0A3 외부 LED ON, 0x063 창문 30% 개방 : RTOS 실행
+     */
     send_ignition_operation(IGNITION_OFF, OP_ALARM);
     can_send_onoff(CAN_ID_BUZZER_CONTROL, true);
     can_send_onoff(CAN_ID_EXT_LED_CONTROL, true);
     send_window_target(30U);
     send_ui(IPC_MSG_CHILD_DETECTED_WARNING, (int32_t)source, 1, 0, 0);
-    printf("[central] child alarm level1 latched source=%u\n", source);
+    printf("[central] child alarm level1 latched source=%u (1=PIR,2=CAMERA)\n", source);
+
+    /* [MOD] 판단 근거 로그: F/W가 실행할 팬/LED 예상 동작을 함께 남긴다. */
+    if (g_lastEnvValid != 0U)
+    {
+        printf("[central] env at alarm: temp=%d.%d C (fan %s expected), lux=%u.%u (LED %s expected)\n",
+               g_lastTempX10 / 10, (g_lastTempX10 < 0 ? -g_lastTempX10 : g_lastTempX10) % 10,
+               (g_lastTempX10 >= ROA_FAN_TEMP_THRESHOLD_X10) ? "ON" : "OFF",
+               g_lastLuxX10 / 10U, g_lastLuxX10 % 10U,
+               (g_lastLuxX10 < ROA_LED_LUX_THRESHOLD_X10) ? "ON" : "OFF");
+    }
+    else
+    {
+        printf("[central] env at alarm: no valid data yet (F/W fail-safe: fan L1 / LED ON)\n");
+    }
+    fflush(stdout);
+
+    /*
+     * [MOD] 1차 경고 = 운전자에게 Telegram 발송 (즉시).
+     * 2차(90초 미조치)는 경찰에게 발송한다 — start_child_alarm_level2() 참조.
+     * 수신자 분리는 CHILD_ALERT_LEVEL1_CMD / CHILD_ALERT_LEVEL2_CMD 환경변수로
+     * 서로 다른 chat_id를 쓰는 스크립트를 지정해 구현한다.
+     */
+    notify_child_alert("CHILD_ALERT_LEVEL1_CMD", "level1 -> driver");
 }
 
 static void start_child_alarm_level2(const char *reason)
 {
-    const char *command;
-    int rc;
-
     if (!g_childAlarmLatched || g_childLevel2Sent)
     {
         return;
@@ -804,15 +1084,9 @@ static void start_child_alarm_level2(const char *reason)
     send_ui(IPC_MSG_CHILD_DETECTED_WARNING, 0, 2, 0, 0);
     printf("[central] child alarm level2: %s\n", reason);
 
-    command = getenv("CHILD_ALERT_LEVEL2_CMD");
-    if (command == NULL || command[0] == '\0')
-    {
-        printf("[central] CHILD_ALERT_LEVEL2_CMD unset; Telegram command skipped\n");
-        return;
-    }
-
-    rc = system(command);
-    printf("[central] CHILD_ALERT_LEVEL2_CMD rc=%d\n", rc);
+    /* [MOD] 2차 경고 = 경찰에게 Telegram 1회 발송 (반복 없음).
+     * g_childLevel2Sent 플래그로 같은 사건에서 재발송이 불가능하다. */
+    notify_child_alert("CHILD_ALERT_LEVEL2_CMD", "level2 -> police");
 }
 
 static void clear_child_alarm(void)
@@ -824,14 +1098,24 @@ static void clear_child_alarm(void)
         return;
     }
 
+    /*
+     * [MOD] "차량 확인 완료" 처리 (최종 정책, 2026-07-12):
+     *  - 현재 경고 사건만 종료: 부저/외부LED/창문/F/W latch/화면 OFF,
+     *    1·2차 타이머와 Telegram 플래그 리셋
+     *  - 감시는 유지 (stop_child_monitoring을 부르지 않음, RPi5 OBJECT_ON 유지)
+     *  - ACK cooldown 시작: 확인자가 차량에서 나갈 시간 동안 재경고 억제
+     *  - cooldown 종료 후 감지가 지속/재발하면 새 1차 경고부터 다시 시작
+     *  - 감시 세션 자체의 초기화는 다음 운행 사이클에서만 수행
+     */
     g_childAlarmLatched = false;
     g_childLevel2Sent = false;
     g_pirDetected = false;
     g_cameraDetected = false;
+    g_childAckCooldownUntilSec = monotonic_seconds() + g_childAckCooldownSec;
 
     if (g_state == STATE_IGNITION_OFF)
     {
-        send_ignition_operation(IGNITION_OFF, OP_PARKING);
+        send_ignition_operation(IGNITION_OFF, OP_PARKING); /* F/W 팬/LED latch 해제 */
         send_ui(IPC_MSG_SCREEN_OFF, 0, 0, 0, 0);
     }
     else
@@ -844,23 +1128,57 @@ static void clear_child_alarm(void)
     send_window_target(0U);
     send_object_detected(false, 0U);
     update_buzzer();
-    printf("[central] child alarm cleared by UI\n");
+    printf("[central] vehicle-check confirmed: alarm event closed, "
+           "monitoring continues, cooldown %us\n", g_childAckCooldownSec);
 }
 
 static void update_child_sensor(uint32_t source, bool detected)
 {
+    /*
+     * [MOD] 잔류 감지 OR 판단은 RPi4 단일 지점에서만 수행한다 (요구사항 5/9-7).
+     *   residual_detected = pir_detected || ai_object_detected
+     * - RTOS는 PIR 원시값을 0x022로 계속 브로드캐스트하므로, 감시 모드가 아닐 때는
+     *   값만 저장하고 판단/로그를 하지 않는다 (기존 코드는 10Hz로 무시 로그를 쏟아냄).
+     * - 해제 직후 재무장 억제 시간 동안은 새 경고를 latch하지 않는다.
+     */
+    bool residualDetected;
+
     if (source == CHILD_SENSOR_CAMERA)
     {
+        if (detected != g_cameraDetected)
+        {
+            printf("[central] AI object detected=%d\n", detected ? 1 : 0);
+        }
         g_cameraDetected = detected;
         send_object_detected(detected, detected ? 100U : 0U);
     }
     else
     {
+        if (detected != g_pirDetected)
+        {
+            printf("[central] PIR detected=%d\n", detected ? 1 : 0);
+        }
         g_pirDetected = detected;
     }
 
-    if (g_pirDetected || g_cameraDetected)
+    if (!g_childMonitoringActive)
     {
+        return;
+    }
+
+    residualDetected = g_pirDetected || g_cameraDetected;
+
+    if (residualDetected)
+    {
+        /* [MOD] ACK cooldown 구간에는 새 경고를 latch하지 않는다
+         * (확인자의 움직임 오탐 방지). 만료 후에는 감지가 지속되든
+         * 재발하든 새 1차 경고로 처리한다. */
+        if (monotonic_seconds() < g_childAckCooldownUntilSec)
+        {
+            return;
+        }
+        printf("[central] residual_detected = PIR(%d) || AI(%d) => 1\n",
+               g_pirDetected ? 1 : 0, g_cameraDetected ? 1 : 0);
         start_child_alarm_level1(source);
     }
 }
@@ -869,22 +1187,39 @@ static void central_tick(void)
 {
     uint64_t now = monotonic_seconds();
 
+    /*
+     * [MOD] can0가 central보다 늦게 올라오는 경우 재시도.
+     * 기존 코드는 시작 시 can_init() 1회 실패하면 영원히 CAN 없이 동작했다.
+     */
+    if (g_canSocket < 0 &&
+        (g_canLastInitTrySec == 0U || now - g_canLastInitTrySec >= CAN_RETRY_INTERVAL_SEC))
+    {
+        g_canLastInitTrySec = now;
+        if (can_init())
+        {
+            printf("[central] CAN socket recovered\n");
+            /* 재연결 직후 현재 상태를 다시 브로드캐스트해 보드 상태를 동기화 */
+            if (g_state == STATE_OPERATIONAL)
+            {
+                send_ignition_operation(IGNITION_ON, OP_RUNNING);
+            }
+            else if (g_state == STATE_PASSENGER_TRANSFER)
+            {
+                send_ignition_operation(IGNITION_ON, OP_BOARDING);
+            }
+            else
+            {
+                send_ignition_operation(IGNITION_OFF, OP_PARKING);
+            }
+        }
+    }
+
     if (g_childAlarmLatched &&
         !g_childLevel2Sent &&
         now >= g_childAlarmStartedSec &&
         now - g_childAlarmStartedSec >= g_childAlertEscalationSec)
     {
         start_child_alarm_level2("timeout without UI clear");
-    }
-
-    if (g_childMonitoringActive &&
-        !g_childAlarmLatched &&
-        now >= g_childMonitoringStartedSec &&
-        now - g_childMonitoringStartedSec >= g_childMonitoringDurationSec)
-    {
-        printf("[central] residual monitoring timeout; keep black screen and stop object model\n");
-        g_childMonitoringActive = false;
-        rpi5_send("OBJECT_OFF");
     }
 }
 
@@ -909,6 +1244,7 @@ static void enter_driver_auth(void)
 static void enter_wait_ignition(uint32_t driverId)
 {
     g_state = STATE_WAIT_IGNITION;
+    printf("[central] state -> WAIT_IGNITION (driverId=%u)\n", driverId); /* [MOD] log */
     load_profile(driverId);
     rpi5_send("FACE_OFF");
     apply_profile();
@@ -923,6 +1259,7 @@ static void enter_wait_ignition(uint32_t driverId)
 static void enter_operational_from_wait(void)
 {
     g_state = STATE_OPERATIONAL;
+    printf("[central] state -> OPERATIONAL (ignition ON)\n"); /* [MOD] log */
     stop_child_monitoring();
     g_referenceSeatbeltBitmap = 0U;
     g_currentSeatbeltBitmap = 0U;
@@ -937,6 +1274,8 @@ static void enter_operational_from_wait(void)
 static void enter_operational_from_transfer(void)
 {
     g_state = STATE_OPERATIONAL;
+    printf("[central] state -> OPERATIONAL (boarding done, reference seats=0x%02X)\n",
+           g_currentSeatbeltBitmap & ACTIVE_SEAT_MASK); /* [MOD] log */
     g_referenceSeatbeltBitmap = g_currentSeatbeltBitmap & ACTIVE_SEAT_MASK;
     send_ignition_operation(IGNITION_ON, OP_RUNNING);
     send_ui(IPC_MSG_SHOW_OPERATION_SCREEN, 0, 0, 0, 0);
@@ -946,9 +1285,16 @@ static void enter_operational_from_transfer(void)
 static void enter_passenger_transfer(void)
 {
     g_state = STATE_PASSENGER_TRANSFER;
+    printf("[central] state -> PASSENGER_TRANSFER\n"); /* [MOD] log */
     g_seatbeltAlarmActive = false;
     update_buzzer();
-    send_ignition_operation(IGNITION_ON, OP_RUNNING);
+    /*
+     * [MOD] 승하차 중에는 OP_BOARDING(4)을 송신한다.
+     * RTOS는 op=4에서 STOPPED_BOARDING 상태로 전환하며 안전벨트 경고 플래그를
+     * 클리어하고, F/W는 OP_STOPPED_BOARDING에서 좌석/팬 수동 제어를 허용한다.
+     * (기존 코드는 OP_RUNNING을 보내 RTOS의 op=4 분기가 죽은 코드였음)
+     */
+    send_ignition_operation(IGNITION_ON, OP_BOARDING);
     send_ui(IPC_MSG_SHOW_BOARDING_SCREEN, 0, 0, 0, 0);
     send_seatbelt_ui();
 }
@@ -956,6 +1302,7 @@ static void enter_passenger_transfer(void)
 static void enter_ignition_off_from_drive(void)
 {
     g_state = STATE_IGNITION_OFF;
+    printf("[central] state -> IGNITION_OFF (+ residual monitoring)\n"); /* [MOD] log */
     g_referenceSeatbeltBitmap = 0U;
     g_currentSeatbeltBitmap = 0U;
     g_seatbeltAlarmActive = false;
@@ -1170,6 +1517,12 @@ static void process_env_frame(const CanMessage *frame)
     humidityX10 = read_u16_le(&frame->data[2]);
     luxX10 = read_u16_le(&frame->data[4]);
     valid = frame->data[6];
+
+    /* [MOD] 잔류 경보 시 팬/LED 판단 로그를 위해 마지막 환경값을 캐시한다. */
+    g_lastTempX10 = tempX10;
+    g_lastLuxX10 = luxX10;
+    g_lastEnvValid = valid;
+
     send_ui(IPC_MSG_ENV_UPDATE, tempX10, humidityX10, luxX10, valid);
 }
 
@@ -1214,6 +1567,16 @@ static void process_fw_status_frame(const CanMessage *frame)
 
 static void process_can_frame(const CanMessage *frame)
 {
+    /* [MOD] CAN_DEBUG_LOG=1 이면 수신 프레임 원시 데이터를 로그로 남긴다.
+     * (요구사항 3-8: can0 실시간 수신 확인 — UI 센서 패널 + 본 로그로 대응) */
+    if (g_canDebugLog)
+    {
+        printf("[can-rx] id=0x%03X dlc=%u data=%02X %02X %02X %02X %02X %02X %02X %02X\n",
+               frame->id, frame->dlc,
+               frame->data[0], frame->data[1], frame->data[2], frame->data[3],
+               frame->data[4], frame->data[5], frame->data[6], frame->data[7]);
+    }
+
     switch (frame->id)
     {
         case CAN_ID_POWER_BUTTON_INPUT:
@@ -1272,12 +1635,23 @@ int main(void)
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
 
+    /* [MOD] 중복 실행 방지 (요구사항 12-1) */
+    if (!pid_file_acquire())
+    {
+        return 1;
+    }
+
     g_childAlertEscalationSec = env_u32("CHILD_ALERT_ESCALATION_SEC",
                                         CHILD_ALERT_DEFAULT_ESCALATION_SEC);
-    g_childMonitoringDurationSec = env_u32("CHILD_MONITOR_DURATION_SEC",
-                                           CHILD_MONITOR_DEFAULT_DURATION_SEC);
+    /* [MOD] ACK cooldown 시간 (기본 30초, CHILD_ACK_COOLDOWN_SEC로 조절) */
+    g_childAckCooldownSec = env_u32("CHILD_ACK_COOLDOWN_SEC",
+                                    CHILD_ACK_COOLDOWN_DEFAULT_SEC);
+    {
+        const char *dbg = getenv("CAN_DEBUG_LOG");
+        g_canDebugLog = (dbg != NULL && strcmp(dbg, "1") == 0);
+    }
 
-    printf("[central] school bus RPi4 central start\n");
+    printf("[central] school bus RPi4 central start (state=%s)\n", state_name(g_state));
 
     (void)ipc_init();
     (void)can_init();
@@ -1304,5 +1678,7 @@ int main(void)
     object_camera_close();
     can_close();
     ipc_close();
+    pid_file_release(); /* [MOD] PID 파일 정리 */
+    printf("[central] shutdown complete\n");
     return 0;
 }

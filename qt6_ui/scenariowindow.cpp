@@ -237,7 +237,8 @@ QWidget *ScenarioWindow::makeWarningScreen()
     m_warningDetail = makeLabel(QStringLiteral("1차 경고 출력 중"), 24);
     layout->addWidget(m_warningTitle);
     layout->addWidget(m_warningDetail);
-    QPushButton *ackButton = makeButton(QStringLiteral("경고 해제"));
+    /* [MOD] 버튼 의미 명확화: 감지 기능 OFF가 아니라 "확인 완료" 입력임을 표현 */
+    QPushButton *ackButton = makeButton(QStringLiteral("차량 확인 완료"));
     ackButton->setStyleSheet(
         "QPushButton { background:#f8fafc; color:#7f1d1d; border:3px solid #fecaca; border-radius:16px; padding:16px; }"
         "QPushButton:pressed { background:#fee2e2; }");
@@ -333,8 +334,8 @@ void ScenarioWindow::showChildWarning(int source, int level)
                                  .arg(sourceText(source)));
     m_stack->setCurrentIndex(ScreenWarning);
 
-    // 경고 화면이 실제로 뜨는 시점이 1차 잔류 아동 경고 진입점이다.
-    // 2차 알림은 Central의 CHILD_ALERT_LEVEL2_CMD가 담당하므로 여기서는 1차 경고만 전송한다.
+    // 경고 화면이 실제로 표시되는 시점이 1차 잔류 아동 경고 진입점이다.
+    // 2차 알림은 Central의 CHILD_ALERT_LEVEL2_CMD 흐름이 담당하므로 여기서는 1차 경고만 전송한다.
     if (level <= 1)
         sendChildWarningToTelegram(source);
 }
@@ -435,7 +436,7 @@ bool ScenarioWindow::loadTelegramConfig(QString *groupId, QString *apiToken) con
 
     for (const QString &path : candidates) {
         QFile file(path);
-        qInfo() << "[telegram] trying config:" << path;
+        qInfo() << "[pin] trying Telegram config:" << path;
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
 
@@ -465,16 +466,16 @@ bool ScenarioWindow::loadTelegramConfig(QString *groupId, QString *apiToken) con
                 *groupId = loadedGroupId;
             if (apiToken)
                 *apiToken = loadedApiToken;
-            qInfo() << "[telegram] config loaded from" << path
+            qInfo() << "[pin] Telegram config loaded from" << path
                     << "group_id_length=" << loadedGroupId.size()
                     << "token_length=" << loadedApiToken.size();
             return true;
         }
 
-        qWarning() << "[telegram] config missing GROUP_ID or API_TOKEN in" << path;
+        qWarning() << "[pin] Telegram config missing GROUP_ID or API_TOKEN in" << path;
     }
 
-    qWarning() << "[telegram] config not found";
+    qWarning() << "[pin] Telegram config not found";
     return false;
 }
 
@@ -500,8 +501,8 @@ void ScenarioWindow::sendTelegramMessage(const QString &messageText,
         return;
     }
 
-    // telegram.txt의 GROUP_ID/API_TOKEN으로 Telegram Bot API sendMessage 요청을 만든다.
-    // 전송 실패가 UI 흐름을 막지 않도록 화면 전환은 유지하고, 결과는 로그와 선택적 상태 문구로만 처리한다.
+    // telegram.txt에서 읽은 GROUP_ID/API_TOKEN으로 Telegram Bot API sendMessage 요청을 만든다.
+    // 전송 실패가 경고 화면 표시를 막지 않도록, 네트워크 결과는 로그와 선택적 상태 문구로만 처리한다.
     QUrl url(QStringLiteral("https://api.telegram.org/bot%1/sendMessage").arg(apiToken));
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader,
