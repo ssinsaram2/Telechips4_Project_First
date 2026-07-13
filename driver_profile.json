@@ -2,17 +2,17 @@
   "drivers": [
     {
       "driverId": 1,
-      "seatPosition": 10,
+      "seatPosition": 1000,
       "temperature": 24
     },
     {
       "driverId": 2,
-      "seatPosition": 20,
+      "seatPosition": 2000,
       "temperature": 22
     },
     {
       "driverId": 3,
-      "seatPosition": 15,
+      "seatPosition": 3000,
       "temperature": 26
     }
   ]

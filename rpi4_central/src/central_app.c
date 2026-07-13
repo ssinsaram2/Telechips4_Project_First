@@ -44,6 +44,9 @@
 #define IGNITION_DISPLAY 1U
 #define IGNITION_ON 2U
 
+#define FAN_MODE_MANUAL 0U
+#define FAN_MODE_AUTO 1U
+
 /*
  * [MOD] 0x083 data[1] 운행 상태 정의 — RPi4/RTOS/F/W 3보드 공통 규약 (canonical).
  *   0 = OP_PARKING  : 시동 OFF / 주차 (잔류 감시 대기 포함)
@@ -676,7 +679,7 @@ static void send_temperature_target(uint8_t tempC)
     uint16_t targetX10 = (uint16_t)tempC * 10U;
     data[0] = (uint8_t)(targetX10 & 0xFFU);
     data[1] = (uint8_t)((targetX10 >> 8) & 0xFFU);
-    data[2] = 0U; /* AUTO */
+    data[2] = FAN_MODE_AUTO;
     data[3] = 0U; /* manual level */
     (void)can_send(CAN_ID_TEMPERATURE_TARGET_VALUE, 4U, data);
 }
@@ -684,10 +687,14 @@ static void send_temperature_target(uint8_t tempC)
 static void send_seat_target(uint8_t duty)
 {
     uint8_t data[5];
+
+    if (duty < 70U)
+        duty = 70U;
+
     data[0] = 1U;       /* forward */
     data[1] = duty;     /* PWM duty */
-    data[2] = 0xE8U;    /* 1000 ms little-endian */
-    data[3] = 0x03U;
+    data[2] = 0xB8U;    /* 1000 ms little-endian */
+    data[3] = 0x0BU;
     data[4] = 0x00U;
     (void)can_send(CAN_ID_SEAT_TARGET_VALUE, 5U, data);
 }
