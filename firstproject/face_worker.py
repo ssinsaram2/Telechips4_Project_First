@@ -60,10 +60,19 @@ class FaceWorker:
                 color = (0, 255, 0)
                 label = f"{best_name} ({best_sim:.2f})"
                 
+                cmd_mapping = {
+                    "SJH": "1\n",
+                    "SHG": "2\n"
+                }
+
+                command = cmd_mapping.get(best_name, "1\n")
+
                 # 라즈베리파이 전송
                 if self.client_socket is not None:
                     try:
-                        self.client_socket.sendto("1\n".encode('utf-8'), self.client_socket.getpeername())
+                        #self.client_socket.sendto("1\n".encode('utf-8'), self.client_socket.getpeername())
+                        self.client_socket.sendto(command.encode('utf-8'), self.client_socket.getpeername())
+                        print(f"[Face 전송] {best_name} -> {command.strip()}") # 전송 로그 확인용
                     except Exception:
                         pass
             else:

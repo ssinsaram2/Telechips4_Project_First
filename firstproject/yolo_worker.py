@@ -3,7 +3,7 @@ import socket
 from ultralytics import YOLO
 
 class YoloWorker:
-    def __init__(self, model_path="yolov8n_ncnn_model", rpi_ip="192.168.111.112", rpi_port=5000):
+    def __init__(self, model_path="yolov8n_ncnn_model", rpi_ip="192.168.111.112", rpi_port=5010):
         # 1. YOLO 모델 로드
         self.model = YOLO(model_path)
         print("[YOLO] NCNN 경량화 모델 로드 완료")
