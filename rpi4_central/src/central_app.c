@@ -113,6 +113,7 @@
 #define MAIN_LOOP_SLEEP_US 10000U
 #define MAX_CAN_FRAMES_PER_LOOP 32
 #define MAX_OBJECT_CAMERA_PER_LOOP 16
+#define DEFAULT_OBJECT_CAMERA_PORT 5010U
 
 typedef enum
 {
@@ -779,7 +780,7 @@ static void rpi5_send_ai_model(uint8_t model)
 static bool object_camera_init(void)
 {
     struct sockaddr_in addr;
-    uint16_t port = (uint16_t)env_u32("OBJECT_CAMERA_PORT", 5000U);
+    uint16_t port = (uint16_t)env_u32("OBJECT_CAMERA_PORT", DEFAULT_OBJECT_CAMERA_PORT);
     int reuse = 1;
 
     g_objectCameraSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -823,6 +824,8 @@ static void object_camera_close(void)
 static bool parse_bool_payload(const char *payload, bool *detected)
 {
     char normalized[128];
+    bool sawNumber = false;
+    bool sawZero = false;
     size_t out = 0U;
     size_t i;
 
@@ -849,6 +852,8 @@ static bool parse_bool_payload(const char *payload, bool *detected)
     if (strcmp(normalized, "1") == 0 ||
         strcmp(normalized, "true") == 0 ||
         strcmp(normalized, "person=1") == 0 ||
+        strcmp(normalized, "people=1") == 0 ||
+        strcmp(normalized, "count=1") == 0 ||
         strcmp(normalized, "person=true") == 0 ||
         strcmp(normalized, "detected=1") == 0 ||
         strcmp(normalized, "detected=true") == 0)
@@ -859,6 +864,8 @@ static bool parse_bool_payload(const char *payload, bool *detected)
     if (strcmp(normalized, "0") == 0 ||
         strcmp(normalized, "false") == 0 ||
         strcmp(normalized, "person=0") == 0 ||
+        strcmp(normalized, "people=0") == 0 ||
+        strcmp(normalized, "count=0") == 0 ||
         strcmp(normalized, "person=false") == 0 ||
         strcmp(normalized, "detected=0") == 0 ||
         strcmp(normalized, "detected=false") == 0)
@@ -867,18 +874,38 @@ static bool parse_bool_payload(const char *payload, bool *detected)
         return true;
     }
 
-    for (i = 0U; normalized[i] != '\0'; i++)
+    /*
+     * RPi5 object detectors often send a person count, not a strict boolean
+     * (examples: "2", "PERSON=2", "{\"person\":2}"). Treat any positive
+     * numeric token as detection and all-zero numeric payloads as clear.
+     */
+    for (i = 0U; normalized[i] != '\0';)
     {
-        if (normalized[i] == '1')
+        if (normalized[i] >= '0' && normalized[i] <= '9')
         {
-            *detected = true;
-            return true;
+            unsigned long value = 0UL;
+            do
+            {
+                value = (value * 10UL) + (unsigned long)(normalized[i] - '0');
+                i++;
+            } while (normalized[i] >= '0' && normalized[i] <= '9');
+
+            sawNumber = true;
+            if (value > 0UL)
+            {
+                *detected = true;
+                return true;
+            }
+            sawZero = true;
+            continue;
         }
-        if (normalized[i] == '0')
-        {
-            *detected = false;
-            return true;
-        }
+        i++;
+    }
+
+    if (sawNumber && sawZero)
+    {
+        *detected = false;
+        return true;
     }
 
     return false;
@@ -1047,13 +1074,48 @@ static void stop_child_monitoring(void)
     update_buzzer();
 }
 
+static bool notify_child_alert_default_script(const char *role, const char *label)
+{
+    static const char *paths[] = {
+        "rpi4_central/scripts/send_child_alert_telegram.sh",
+        "./rpi4_central/scripts/send_child_alert_telegram.sh",
+        "/opt/central/send_child_alert_telegram.sh",
+        "/opt/central/bin/send_child_alert_telegram.sh",
+        "send_child_alert_telegram.sh"
+    };
+    char command[512];
+    size_t i;
+    int rc;
+
+    for (i = 0U; i < sizeof(paths) / sizeof(paths[0]); i++)
+    {
+        if (strcmp(paths[i], "send_child_alert_telegram.sh") != 0 &&
+            access(paths[i], X_OK) != 0)
+        {
+            continue;
+        }
+
+        if (snprintf(command, sizeof(command), "%s %s", paths[i], role) >= (int)sizeof(command))
+        {
+            continue;
+        }
+
+        rc = system(command);
+        printf("[central] Telegram %s via default script (%s) rc=%d\n",
+               label, paths[i], rc);
+        fflush(stdout);
+        return true;
+    }
+
+    return false;
+}
+
 /*
  * [MOD] Telegram 발송 공통 헬퍼.
  * env_name으로 지정된 환경변수의 명령을 실행한다.
  *   CHILD_ALERT_LEVEL1_CMD : 1차 경고 → 운전자 chat_id
  *   CHILD_ALERT_LEVEL2_CMD : 2차 경고 → 경찰 chat_id
- * 두 변수는 서로 다른 스크립트(또는 같은 스크립트 + 다른 TELEGRAM_CHAT_ID)를
- * 가리켜야 한다. 미설정 시 발송을 건너뛰고 로그만 남긴다(경고 장치는 정상 동작).
+ * level2는 환경변수가 없어도 기본 스크립트를 찾아 police.txt 기준으로 전송한다.
  */
 static void notify_child_alert(const char *env_name, const char *label)
 {
@@ -1062,6 +1124,12 @@ static void notify_child_alert(const char *env_name, const char *label)
 
     if (command == NULL || command[0] == '\0')
     {
+        if (strcmp(env_name, "CHILD_ALERT_LEVEL2_CMD") == 0 &&
+            notify_child_alert_default_script("police", label))
+        {
+            return;
+        }
+
         printf("[central] %s unset; Telegram skipped (%s)\n", env_name, label);
         fflush(stdout);
         return;

@@ -63,8 +63,12 @@ qt6_ui/
    - 창문 `0x063` 목표값 30
    - 상태 `0x083 [0x00, 0x02]` 전송
 6. UI의 `경고 해제` 버튼을 30초 이내에 누르면 경고가 꺼지고 검은 화면으로 돌아갑니다.
-7. 30초 동안 해제하지 않으면 `CHILD_ALERT_LEVEL2_CMD` 환경변수에 설정한 명령을 실행합니다.
-   기본 제공 스크립트는 텔레그램 전송용 `send_child_alert_telegram.sh`입니다.
+7. 30초 동안 해제하지 않으면 2차 경고로 경찰 텔레그램 채팅방에 아래 문구를 전송합니다.
+   기본 수신처/봇 토큰은 `police.txt`의 `CHAT_ID`/`API_TOKEN`을 사용합니다.
+
+```text
+아동용 승하차 차량에 잔류 아동이 감지되었습니다! 해당 차량의 위치로 출동하십시오!
+```
 
 ## RPi4 Central 빌드
 
@@ -82,7 +86,7 @@ export RPI5_AI_HOST=192.168.111.113
 export RPI5_AI_CONTROL_PORT=5020
 export OBJECT_CAMERA_PORT=5010
 export CHILD_ALERT_ESCALATION_SEC=30
-export CHILD_ALERT_LEVEL2_CMD="/opt/central/send_child_alert_telegram.sh"
+export CHILD_ALERT_LEVEL2_CMD="/opt/central/send_child_alert_telegram.sh police"
 sudo /opt/central/central_app
 ```
 
