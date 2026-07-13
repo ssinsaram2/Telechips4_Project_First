@@ -1,0 +1,16 @@
+Debug/
+Release/
+.settings/language.settings.xml
+
+*.o
+*.d
+*.su
+*.cyclo
+*.elf
+*.bin
+*.hex
+*.map
+*.list
+*.launch
+
+.metadata/
