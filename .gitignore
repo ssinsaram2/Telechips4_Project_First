@@ -47,6 +47,7 @@ ui_*.h
 .env
 .env.*
 telegram.txt
+police.txt
 
 # Logs and temporary files
 *.log
