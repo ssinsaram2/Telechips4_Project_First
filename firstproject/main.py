@@ -84,7 +84,7 @@ try:
             fps_ema = inst_fps if fps_ema == 0.0 else (EMA_ALPHA * inst_fps + (1 - EMA_ALPHA) * fps_ema)
 
         # 화면에 현재 모드 상태 표시
-        mode_str = {0: "InsightFace Only", 1: "AI Disabled", 2: "Face + YOLO"}.get(mode, "Unknown")
+        mode_str = {0: "InsightFace Only", 1: "AI Disabled", 2: "YOLO Only"}.get(mode, "Unknown")
         cv2.putText(frame, f"MODE: {mode} ({mode_str})", (10, frame.shape[0] - 20),
                     cv2.FONT_HERSHEY_SIMPLEX, 0.6, (0, 255, 0), 2)
         cv2.putText(frame, f"FPS: {fps_ema:.1f}", (frame.shape[1] - 120, 30),
