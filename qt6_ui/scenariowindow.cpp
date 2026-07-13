@@ -336,7 +336,7 @@ void ScenarioWindow::showChildWarning(int source, int level)
     // 경고 화면이 실제로 뜨는 시점이 1차 잔류 아동 경고 진입점이다.
     // 2차 알림은 Central의 CHILD_ALERT_LEVEL2_CMD가 담당하므로 여기서는 1차 경고만 전송한다.
     if (level <= 1)
-        sendChildWarningToTelegram(source, level);
+        sendChildWarningToTelegram(source);
 }
 
 void ScenarioWindow::showAuthFailScreen()
@@ -540,10 +540,8 @@ void ScenarioWindow::sendPinCodeToTelegram(const QString &pinCode)
                         QStringLiteral("텔레그램 전송 실패: "));
 }
 
-void ScenarioWindow::sendChildWarningToTelegram(int source, int level)
+void ScenarioWindow::sendChildWarningToTelegram(int source)
 {
-    Q_UNUSED(level);
-
     sendTelegramMessage(QStringLiteral("잔류 아동이 감지되었습니다! 차량 내부를 확인하십시오!\n감지 경로: %1")
                             .arg(sourceText(source)),
                         QStringLiteral("[child-alert]"));

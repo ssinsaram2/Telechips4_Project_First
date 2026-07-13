@@ -80,7 +80,7 @@ private:
                              const QString &successStatus = QString(),
                              const QString &failurePrefix = QString());
     void sendPinCodeToTelegram(const QString &pinCode);
-    void sendChildWarningToTelegram(int source, int level);
+    void sendChildWarningToTelegram(int source);
     void setPinStatus(const QString &text);
     void startAuthTimeout();
     void stopAuthTimeout();
