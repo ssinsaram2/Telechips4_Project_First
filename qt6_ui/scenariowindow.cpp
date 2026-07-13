@@ -332,6 +332,11 @@ void ScenarioWindow::showChildWarning(int source, int level)
                                  .arg(levelText(level))
                                  .arg(sourceText(source)));
     m_stack->setCurrentIndex(ScreenWarning);
+
+    // 경고 화면이 실제로 뜨는 시점이 1차 잔류 아동 경고 진입점이다.
+    // 2차 알림은 Central의 CHILD_ALERT_LEVEL2_CMD가 담당하므로 여기서는 1차 경고만 전송한다.
+    if (level <= 1)
+        sendChildWarningToTelegram(source, level);
 }
 
 void ScenarioWindow::showAuthFailScreen()
@@ -430,7 +435,7 @@ bool ScenarioWindow::loadTelegramConfig(QString *groupId, QString *apiToken) con
 
     for (const QString &path : candidates) {
         QFile file(path);
-        qInfo() << "[pin] trying Telegram config:" << path;
+        qInfo() << "[telegram] trying config:" << path;
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
 
@@ -460,34 +465,43 @@ bool ScenarioWindow::loadTelegramConfig(QString *groupId, QString *apiToken) con
                 *groupId = loadedGroupId;
             if (apiToken)
                 *apiToken = loadedApiToken;
-            qInfo() << "[pin] Telegram config loaded from" << path
+            qInfo() << "[telegram] config loaded from" << path
                     << "group_id_length=" << loadedGroupId.size()
                     << "token_length=" << loadedApiToken.size();
             return true;
         }
 
-        qWarning() << "[pin] Telegram config missing GROUP_ID or API_TOKEN in" << path;
+        qWarning() << "[telegram] config missing GROUP_ID or API_TOKEN in" << path;
     }
 
-    qWarning() << "[pin] Telegram config not found";
+    qWarning() << "[telegram] config not found";
     return false;
 }
 
-void ScenarioWindow::sendPinCodeToTelegram(const QString &pinCode)
+void ScenarioWindow::sendTelegramMessage(const QString &messageText,
+                                         const QString &logPrefix,
+                                         const QString &configErrorStatus,
+                                         const QString &networkErrorStatus,
+                                         const QString &successStatus,
+                                         const QString &failurePrefix)
 {
     QString groupId;
     QString apiToken;
     if (!loadTelegramConfig(&groupId, &apiToken)) {
-        setPinStatus(QStringLiteral("telegram.txt에서 GROUP_ID/API_TOKEN을 읽지 못했습니다."));
+        if (!configErrorStatus.isEmpty())
+            setPinStatus(configErrorStatus);
         return;
     }
 
     if (!m_telegramNetwork) {
-        qWarning() << "[pin] Telegram network manager is not initialized";
-        setPinStatus(QStringLiteral("텔레그램 전송 준비가 되지 않았습니다."));
+        qWarning() << logPrefix << "Telegram network manager is not initialized";
+        if (!networkErrorStatus.isEmpty())
+            setPinStatus(networkErrorStatus);
         return;
     }
 
+    // telegram.txt의 GROUP_ID/API_TOKEN으로 Telegram Bot API sendMessage 요청을 만든다.
+    // 전송 실패가 UI 흐름을 막지 않도록 화면 전환은 유지하고, 결과는 로그와 선택적 상태 문구로만 처리한다.
     QUrl url(QStringLiteral("https://api.telegram.org/bot%1/sendMessage").arg(apiToken));
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader,
@@ -495,24 +509,44 @@ void ScenarioWindow::sendPinCodeToTelegram(const QString &pinCode)
 
     QUrlQuery body;
     body.addQueryItem(QStringLiteral("chat_id"), groupId);
-    body.addQueryItem(QStringLiteral("text"),
-                      QStringLiteral("통학차량 PIN 로그인 인증번호: %1").arg(pinCode));
+    body.addQueryItem(QStringLiteral("text"), messageText);
 
-    qInfo() << "[pin] sending Telegram PIN message";
+    qInfo() << logPrefix << "sending Telegram message";
     QNetworkReply *reply = m_telegramNetwork->post(request,
                                                    body.toString(QUrl::FullyEncoded).toUtf8());
-    connect(reply, &QNetworkReply::finished, this, [this, reply]() {
+    connect(reply, &QNetworkReply::finished, this, [this, reply, logPrefix, successStatus, failurePrefix]() {
         const QVariant status = reply->attribute(QNetworkRequest::HttpStatusCodeAttribute);
         if (reply->error() == QNetworkReply::NoError) {
-            qInfo() << "[pin] Telegram PIN message sent; http_status=" << status;
-            setPinStatus(QStringLiteral("텔레그램으로 PIN을 전송했습니다."));
+            qInfo() << logPrefix << "Telegram message sent; http_status=" << status;
+            if (!successStatus.isEmpty())
+                setPinStatus(successStatus);
         } else {
-            qWarning() << "[pin] Telegram PIN message failed; http_status=" << status
+            qWarning() << logPrefix << "Telegram message failed; http_status=" << status
                        << "error=" << reply->errorString();
-            setPinStatus(QStringLiteral("텔레그램 전송 실패: %1").arg(reply->errorString()));
+            if (!failurePrefix.isEmpty())
+                setPinStatus(QStringLiteral("%1%2").arg(failurePrefix, reply->errorString()));
         }
         reply->deleteLater();
     });
+}
+
+void ScenarioWindow::sendPinCodeToTelegram(const QString &pinCode)
+{
+    sendTelegramMessage(QStringLiteral("통학차량 PIN 로그인 인증번호: %1").arg(pinCode),
+                        QStringLiteral("[pin]"),
+                        QStringLiteral("telegram.txt에서 GROUP_ID/API_TOKEN을 읽지 못했습니다."),
+                        QStringLiteral("텔레그램 전송 준비가 되지 않았습니다."),
+                        QStringLiteral("텔레그램으로 PIN을 전송했습니다."),
+                        QStringLiteral("텔레그램 전송 실패: "));
+}
+
+void ScenarioWindow::sendChildWarningToTelegram(int source, int level)
+{
+    Q_UNUSED(level);
+
+    sendTelegramMessage(QStringLiteral("잔류 아동이 감지되었습니다! 차량 내부를 확인하십시오!\n감지 경로: %1")
+                            .arg(sourceText(source)),
+                        QStringLiteral("[child-alert]"));
 }
 
 void ScenarioWindow::setPinStatus(const QString &text)

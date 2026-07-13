@@ -73,7 +73,14 @@ private:
     QString generatePinCode() const;
     void issuePinCode();
     bool loadTelegramConfig(QString *groupId, QString *apiToken) const;
+    void sendTelegramMessage(const QString &messageText,
+                             const QString &logPrefix,
+                             const QString &configErrorStatus = QString(),
+                             const QString &networkErrorStatus = QString(),
+                             const QString &successStatus = QString(),
+                             const QString &failurePrefix = QString());
     void sendPinCodeToTelegram(const QString &pinCode);
+    void sendChildWarningToTelegram(int source, int level);
     void setPinStatus(const QString &text);
     void startAuthTimeout();
     void stopAuthTimeout();

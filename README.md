@@ -57,6 +57,7 @@ qt6_ui/
 4. PIR `0x022` 또는 카메라 객체감지 UDP 5010 포트 중 하나라도 감지되면 1차 경고입니다.
 5. 1차 경고 시 Central은 다음을 수행합니다.
    - UI 경고 화면 표시
+   - UI가 `telegram.txt`의 `GROUP_ID`/`API_TOKEN`으로 텔레그램 1차 경고 전송
    - 부저 `0x0C3` ON
    - 외부 LED `0x0A3` ON
    - 창문 `0x063` 목표값 30
