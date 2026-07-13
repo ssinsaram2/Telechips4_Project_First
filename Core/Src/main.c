@@ -115,7 +115,7 @@ int main(void)
   /* MCU Configuration--------------------------------------------------------*/
 
   /* Reset of all peripherals, Initializes the Flash interface and the Systick. */
-   HAL_Init();
+	HAL_Init();
 
   /* USER CODE BEGIN Init */
 
@@ -147,6 +147,10 @@ int main(void)
   BSP_PWM_Fan_SetDuty(0u);
   BSP_Seat_Stop();
   BSP_GPIO_LED_Cabin_Write(0u);
+
+
+
+
 
   g_fw.temp_target_x10         = FAN_TARGET_TEMP_X10;
   g_fw.light_lux_threshold_x10 = LIGHT_THRESHOLD_X10;
@@ -199,6 +203,18 @@ int main(void)
 
   /* DHT22 전원 안정화 */
   HAL_Delay(2000u);
+
+
+  /* USER CODE BEGIN 2 */
+  FW_Sensor_Init();
+
+  HAL_TIM_PWM_Start(&htim3, TIM_CHANNEL_1);
+  HAL_TIM_PWM_Start(&htim4, TIM_CHANNEL_1);
+
+  BSP_PWM_Fan_SetDuty(0u);
+  BSP_Seat_Stop();
+  BSP_GPIO_LED_Cabin_Write(0u);
+
 
   /* USER CODE END 2 */
 

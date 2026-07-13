@@ -88,7 +88,7 @@ typedef enum {
 #define FAN_TARGET_TEMP_MAX_X10  350    /* 35.0 °C  : CAN 입력 상한          */
 #define FAN_DIFF_SMALL_X10        10    /*  1.0 °C  : 1단/2단 경계          */
 #define FAN_DIFF_MEDIUM_X10       30    /*  3.0 °C  : 2단/3단 경계          */
-#define LIGHT_THRESHOLD_X10     7000    /* 700.0 lux: 초기 조도 기준값
+#define LIGHT_THRESHOLD_X10     1000    /* 700.0 lux: 초기 조도 기준값
                                            NOTE: 실내 기준 다소 민감할 수 있음.
                                            실측 후 CAN(0x0B3)으로 튜닝 권장  */
 
