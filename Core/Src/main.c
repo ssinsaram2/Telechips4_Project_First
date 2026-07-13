@@ -35,8 +35,11 @@ typedef enum
   DRIVER_AUTH,
   WAIT_IGNITION,
   OPERATIONAL,
-  MONITORING,
-  ALARM_STATE,
+  /* [MOD] 이름 정리 (요구사항 8): 기존 MONITORING은 실제로 "RPi4가 잔류 감지를
+     확정해 0x083 op=OP_ALARM(2)을 내린 상태"를 의미했다. 감시(모니터링)와
+     경보(알람)를 혼동하지 않도록 RESIDUAL_ALARM으로 개명. 열거값(4)은 유지. */
+  RESIDUAL_ALARM,
+  ALARM_STATE,   /* (reserved — 사용처 없음, 열거값 유지 목적) */
   /* RPi4가 승하차(BOARDING) 상태를 통지할 때 사용. OPERATIONAL이 아니므로
      이 상태에서는 안전벨트 해제가 부저 경고로 이어지지 않는다. (요구사항 2-4/시나리오3)
      맨 뒤에 추가하여 기존 열거값(0~5)은 그대로 유지한다. */
@@ -401,10 +404,14 @@ static void MX_CAN1_Init(void)
      - AutoBusOff=ENABLE : STM32가 RPi4보다 먼저 켜져 ACK 없이 송신 → TX 에러 누적으로
        bus-off에 빠져도, 자동으로 bus-off에서 복구한다. (예전 DISABLE에서는 한번 bus-off되면
        재초기화 전까지 통신 불가 → "RPi를 먼저 켜야 통신" 증상)
-     - AutoRetransmission=ENABLE : ACK 실패한 프레임을 자동 재전송한다. */
+     - [MOD] AutoRetransmission=DISABLE 로 원복.
+       ENABLE 상태에서 버스에 ACK 상대가 없으면 실패 프레임이 TX mailbox 3개를
+       모두 점유한 채 무한 재전송 → GetTxMailboxesFreeLevel()==0 → 이후 모든
+       송신이 막히는 완전 통신 불능이 실측으로 확인됨.
+       ACK 유실 복구는 AutoBusOff=ENABLE + 100ms 주기 재송신 구조로 충분하다. */
   hcan1.Init.AutoBusOff = ENABLE;
   hcan1.Init.AutoWakeUp = DISABLE;
-  hcan1.Init.AutoRetransmission = ENABLE;
+  hcan1.Init.AutoRetransmission = DISABLE;
   hcan1.Init.ReceiveFifoLocked = DISABLE;
   hcan1.Init.TransmitFifoPriority = DISABLE;
   if (HAL_CAN_Init(&hcan1) != HAL_OK)
@@ -713,6 +720,12 @@ void CAN_Command_Process(void)
     {
         can_window_cmd_updated = 0;
 
+        /*
+         * 0x063 data[0] = 목표 개방률(%).
+         *  >0 : 잔류 경보 — 창문을 잠깐 열어 환기 (300ms 구동 후 정지)
+         *  [MOD] 0 : 경보 해제 — 이전에 열었던 경우 원위치(닫힘)로 복귀.
+         *        기존 코드는 0에서 Stop만 수행해 창문이 열린 채 방치되었다.
+         */
         if (can_window_cmd > 0)
         {
             Window_Open();
@@ -722,6 +735,12 @@ void CAN_Command_Process(void)
         }
         else
         {
+            if (window_opened != 0)
+            {
+                Window_Close();
+                osDelay(300);
+                window_opened = 0;
+            }
             Window_Stop();
         }
     }
@@ -744,7 +763,11 @@ void CAN_Command_Process(void)
             else
             {
                 current_state = IGNITION_OFF;
-                window_opened = 0;
+                /* [MOD] window_opened 리셋 제거.
+                   RPi4의 경보 해제 시퀀스는 0x083(op=0) → 0x063(0%) 순서로
+                   도착한다. 여기서 플래그를 지우면 뒤따라오는 창문 닫힘 명령이
+                   "이미 닫힘"으로 오판되어 창문이 열린 채 남는다.
+                   창문 상태 추적은 0x063 처리부에서만 갱신한다. */
             }
         }
         else if (can_operation_cmd == 1)
@@ -753,11 +776,14 @@ void CAN_Command_Process(void)
         }
         else if (can_operation_cmd == 2)
         {
-            current_state = MONITORING;
-            window_opened = 0;
+            /* [MOD] op=2 = OP_ALARM : RPi4가 잔류 감지를 확정한 상태.
+               부저/외부LED/창문은 별도 명령(0x0C3/0x0A3/0x063)으로 내려온다.
+               RTOS는 상태 추종만 하고 스스로 경보를 시작하지 않는다. */
+            current_state = RESIDUAL_ALARM;
         }
         else if (can_operation_cmd == 4)
         {
+            /* op=4 = OP_BOARDING : 승하차 중 (RPi4 enter_passenger_transfer) */
             current_state = STOPPED_BOARDING;
             osEventFlagsClear(safetyEventHandle, EVT_SEATBELT_WARNING);
         }
