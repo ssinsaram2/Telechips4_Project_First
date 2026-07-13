@@ -99,6 +99,16 @@
 #define ROA_LED_LUX_THRESHOLD_X10   7000   /* 700.0 lux 미만이면 내부 LED ON */
 #define CHILD_SENSOR_PIR 1U
 #define CHILD_SENSOR_CAMERA 2U
+/*
+ * [MOD] RPi5 AI 모델 선택 번호.
+ * Central은 차량 상태 전환 시 이 번호를 이더넷 UDP payload로 RPi5에 보낸다.
+ *   0 = AI 모델 미사용
+ *   1 = 얼굴 감지/인증 모델 사용 (InsightFace 계열)
+ *   2 = 객체 감지 모델 사용 (YOLOv8-nano 계열, 잔류 아동 감지)
+ */
+#define AI_MODEL_NONE        0U
+#define AI_MODEL_FACE_AUTH   1U
+#define AI_MODEL_OBJECT_ROA  2U
 #define ACTIVE_SEAT_MASK 0x03U
 #define MAIN_LOOP_SLEEP_US 10000U
 #define MAX_CAN_FRAMES_PER_LOOP 32
@@ -727,6 +737,37 @@ static void rpi5_send(const char *command)
     (void)udp_send_text(host, port, command);
 }
 
+static const char *ai_model_name(uint8_t model)
+{
+    switch (model)
+    {
+        case AI_MODEL_NONE:
+            return "none";
+        case AI_MODEL_FACE_AUTH:
+            return "face";
+        case AI_MODEL_OBJECT_ROA:
+            return "object";
+        default:
+            return "unknown";
+    }
+}
+
+static void rpi5_send_ai_model(uint8_t model)
+{
+    char payload[4];
+
+    /*
+     * [MOD] RPi5 AI 런타임 선택 명령.
+     * RPi5 쪽 요구사항이 "숫자"이므로 UDP payload는 부가 문자열 없이 0/1/2만 보낸다.
+     * 같은 제어 포트로 FACE_ON/OBJECT_ON 같은 문자열을 섞어 보내지 않아 RPi5 숫자 파서와 충돌하지 않는다.
+     */
+    (void)snprintf(payload, sizeof(payload), "%u", (unsigned int)model);
+    printf("[central] RPi5 AI model select: %u (%s)\n",
+           (unsigned int)model,
+           ai_model_name(model));
+    rpi5_send(payload);
+}
+
 static bool object_camera_init(void)
 {
     struct sockaddr_in addr;
@@ -959,8 +1000,8 @@ static void start_child_monitoring(void)
     g_pirDetected = false;
     g_cameraDetected = false;
     g_childAckCooldownUntilSec = 0U; /* [MOD] 새 세션은 이전 cooldown을 승계하지 않는다 */
-    rpi5_send("FACE_OFF");
-    rpi5_send("OBJECT_ON");
+    /* [MOD] 시동 OFF 후 잔류 아동 감시 상태: RPi5는 객체 감지 모델(2)을 사용한다. */
+    rpi5_send_ai_model(AI_MODEL_OBJECT_ROA);
     printf("[central] residual child monitoring started\n");
 }
 
@@ -986,7 +1027,8 @@ static void stop_child_monitoring(void)
     g_childLevel2Sent = false;
     g_pirDetected = false;
     g_cameraDetected = false;
-    rpi5_send("OBJECT_OFF");
+    /* [MOD] 잔류 감시 종료/주행 전환 시 RPi5 AI 모델을 끈다(0). */
+    rpi5_send_ai_model(AI_MODEL_NONE);
     send_object_detected(false, 0U);
     can_send_onoff(CAN_ID_EXT_LED_CONTROL, false);
     send_window_target(0U);
@@ -1102,7 +1144,7 @@ static void clear_child_alarm(void)
      * [MOD] "차량 확인 완료" 처리 (최종 정책, 2026-07-12):
      *  - 현재 경고 사건만 종료: 부저/외부LED/창문/F/W latch/화면 OFF,
      *    1·2차 타이머와 Telegram 플래그 리셋
-     *  - 감시는 유지 (stop_child_monitoring을 부르지 않음, RPi5 OBJECT_ON 유지)
+     *  - 감시는 유지 (stop_child_monitoring을 부르지 않음, RPi5 AI 모델 2 유지)
      *  - ACK cooldown 시작: 확인자가 차량에서 나갈 시간 동안 재경고 억제
      *  - cooldown 종료 후 감지가 지속/재발하면 새 1차 경고부터 다시 시작
      *  - 감시 세션 자체의 초기화는 다음 운행 사이클에서만 수행
@@ -1134,14 +1176,12 @@ static void clear_child_alarm(void)
 
 static void update_child_sensor(uint32_t source, bool detected)
 {
-    /*
-     * [MOD] 잔류 감지 OR 판단은 RPi4 단일 지점에서만 수행한다 (요구사항 5/9-7).
-     *   residual_detected = pir_detected || ai_object_detected
-     * - RTOS는 PIR 원시값을 0x022로 계속 브로드캐스트하므로, 감시 모드가 아닐 때는
-     *   값만 저장하고 판단/로그를 하지 않는다 (기존 코드는 10Hz로 무시 로그를 쏟아냄).
-     * - 해제 직후 재무장 억제 시간 동안은 새 경고를 latch하지 않는다.
-     */
-    bool residualDetected;
+    /* [보완] ACK 쿨다운 구간(Muting Window)에는 외부 센서 신호 유입을 완벽히 차단하여
+    * 확인자가 내리는 움직임으로 인해 내부 캐시 변수가 다시 true로 오염되는 것을 방지합니다. */
+    if (g_childMonitoringActive && (monotonic_seconds() < g_childAckCooldownUntilSec))
+    {
+        return;
+    }
 
     if (source == CHILD_SENSOR_CAMERA)
     {
@@ -1166,17 +1206,10 @@ static void update_child_sensor(uint32_t source, bool detected)
         return;
     }
 
-    residualDetected = g_pirDetected || g_cameraDetected;
+    bool residualDetected = g_pirDetected || g_cameraDetected;
 
     if (residualDetected)
     {
-        /* [MOD] ACK cooldown 구간에는 새 경고를 latch하지 않는다
-         * (확인자의 움직임 오탐 방지). 만료 후에는 감지가 지속되든
-         * 재발하든 새 1차 경고로 처리한다. */
-        if (monotonic_seconds() < g_childAckCooldownUntilSec)
-        {
-            return;
-        }
         printf("[central] residual_detected = PIR(%d) || AI(%d) => 1\n",
                g_pirDetected ? 1 : 0, g_cameraDetected ? 1 : 0);
         start_child_alarm_level1(source);
@@ -1187,10 +1220,7 @@ static void central_tick(void)
 {
     uint64_t now = monotonic_seconds();
 
-    /*
-     * [MOD] can0가 central보다 늦게 올라오는 경우 재시도.
-     * 기존 코드는 시작 시 can_init() 1회 실패하면 영원히 CAN 없이 동작했다.
-     */
+    /* 1. CAN 소켓 재연결 로직 (기존 유지) */
     if (g_canSocket < 0 &&
         (g_canLastInitTrySec == 0U || now - g_canLastInitTrySec >= CAN_RETRY_INTERVAL_SEC))
     {
@@ -1198,28 +1228,36 @@ static void central_tick(void)
         if (can_init())
         {
             printf("[central] CAN socket recovered\n");
-            /* 재연결 직후 현재 상태를 다시 브로드캐스트해 보드 상태를 동기화 */
-            if (g_state == STATE_OPERATIONAL)
-            {
-                send_ignition_operation(IGNITION_ON, OP_RUNNING);
-            }
-            else if (g_state == STATE_PASSENGER_TRANSFER)
-            {
-                send_ignition_operation(IGNITION_ON, OP_BOARDING);
-            }
-            else
-            {
-                send_ignition_operation(IGNITION_OFF, OP_PARKING);
-            }
+            if (g_state == STATE_OPERATIONAL) send_ignition_operation(IGNITION_ON, OP_RUNNING);
+            else if (g_state == STATE_PASSENGER_TRANSFER) send_ignition_operation(IGNITION_ON, OP_BOARDING);
+            else send_ignition_operation(IGNITION_OFF, OP_PARKING);
         }
     }
 
+    /* 2. 1차 -> 2차 텔레그램 에스컬레이션 타이머 (기존 유지) */
     if (g_childAlarmLatched &&
         !g_childLevel2Sent &&
         now >= g_childAlarmStartedSec &&
         now - g_childAlarmStartedSec >= g_childAlertEscalationSec)
     {
         start_child_alarm_level2("timeout without UI clear");
+    }
+
+    /* [보완] 3. 쿨다운 만료 시 상시 잔류 검증 (Timer Polling)
+     * 쿨다운이 방금 종료되었는데, 아동이 여전히 잔류하여 하드웨어 센서 신호가 HIGH(1) 상태를
+     * 계속 유지하고 있다면, 새 이벤트 유입을 기다리지 않고 타이머 루프에서 즉시 재경보를 발령합니다. */
+    if (g_childMonitoringActive && !g_childAlarmLatched &&
+        g_childAckCooldownUntilSec != 0U && now >= g_childAckCooldownUntilSec)
+    {
+        g_childAckCooldownUntilSec = 0U; // 쿨다운 플래그 리셋
+
+        // 외부 장치(라즈베리파이5/CAN 보드)로부터 상시 전송되는 물리 센서의 마지막 상태 체크
+        if (g_pirDetected || g_cameraDetected)
+        {
+            printf("[central] Cooldown expired but child still present. Re-latching alarm!\n");
+            fflush(stdout);
+            start_child_alarm_level1(g_pirDetected ? CHILD_SENSOR_PIR : CHILD_SENSOR_CAMERA);
+        }
     }
 }
 
@@ -1232,8 +1270,8 @@ static void enter_driver_auth(void)
 
     g_state = STATE_DRIVER_AUTH;
 
-    rpi5_send("OBJECT_OFF");
-    rpi5_send("FACE_ON");
+    /* [MOD] 로그인/운전자 인증 화면: RPi5는 얼굴 감지/인증 모델(1)을 사용한다. */
+    rpi5_send_ai_model(AI_MODEL_FACE_AUTH);
 
     printf("[central] send UI auth screen\n");
     fflush(stdout);
@@ -1246,7 +1284,8 @@ static void enter_wait_ignition(uint32_t driverId)
     g_state = STATE_WAIT_IGNITION;
     printf("[central] state -> WAIT_IGNITION (driverId=%u)\n", driverId); /* [MOD] log */
     load_profile(driverId);
-    rpi5_send("FACE_OFF");
+    /* [MOD] 인증 완료 후 시동 ON 대기 화면: 얼굴 인증이 끝났으므로 AI 모델을 끈다(0). */
+    rpi5_send_ai_model(AI_MODEL_NONE);
     apply_profile();
     send_ui(IPC_MSG_SHOW_READY_SCREEN,
             (int32_t)g_profile.driverId,
@@ -1264,7 +1303,8 @@ static void enter_operational_from_wait(void)
     g_referenceSeatbeltBitmap = 0U;
     g_currentSeatbeltBitmap = 0U;
     g_seatbeltAlarmActive = false;
-    rpi5_send("ALL_OFF");
+    /* [MOD] 주행 상태: RPi5 AI 모델 미사용(0). */
+    rpi5_send_ai_model(AI_MODEL_NONE);
     send_ignition_operation(IGNITION_ON, OP_RUNNING);
     apply_profile();
     send_ui(IPC_MSG_SHOW_OPERATION_SCREEN, 0, 0, 0, 0);
@@ -1277,6 +1317,8 @@ static void enter_operational_from_transfer(void)
     printf("[central] state -> OPERATIONAL (boarding done, reference seats=0x%02X)\n",
            g_currentSeatbeltBitmap & ACTIVE_SEAT_MASK); /* [MOD] log */
     g_referenceSeatbeltBitmap = g_currentSeatbeltBitmap & ACTIVE_SEAT_MASK;
+    /* [MOD] 승하차 종료 후 주행 복귀: RPi5 AI 모델 미사용(0). */
+    rpi5_send_ai_model(AI_MODEL_NONE);
     send_ignition_operation(IGNITION_ON, OP_RUNNING);
     send_ui(IPC_MSG_SHOW_OPERATION_SCREEN, 0, 0, 0, 0);
     send_seatbelt_ui();
@@ -1288,6 +1330,8 @@ static void enter_passenger_transfer(void)
     printf("[central] state -> PASSENGER_TRANSFER\n"); /* [MOD] log */
     g_seatbeltAlarmActive = false;
     update_buzzer();
+    /* [MOD] 승하차 중에도 주행 계열 상태이므로 RPi5 AI 모델 미사용(0). */
+    rpi5_send_ai_model(AI_MODEL_NONE);
     /*
      * [MOD] 승하차 중에는 OP_BOARDING(4)을 송신한다.
      * RTOS는 op=4에서 STOPPED_BOARDING 상태로 전환하며 안전벨트 경고 플래그를
@@ -1632,6 +1676,8 @@ static void process_object_camera_messages(void)
 
 int main(void)
 {
+    rpi5_send_ai_model(5);
+
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
 
@@ -1657,7 +1703,7 @@ int main(void)
     (void)can_init();
     (void)object_camera_init();
 
-    rpi5_send("ALL_OFF");
+    rpi5_send_ai_model(AI_MODEL_NONE);
     send_ignition_operation(IGNITION_OFF, OP_PARKING);
     send_ui(IPC_MSG_SCREEN_OFF, 0, 0, 0, 0);
 
@@ -1674,7 +1720,7 @@ int main(void)
     send_ignition_operation(IGNITION_OFF, OP_PARKING);
     can_send_onoff(CAN_ID_BUZZER_CONTROL, false);
     can_send_onoff(CAN_ID_EXT_LED_CONTROL, false);
-    rpi5_send("ALL_OFF");
+    rpi5_send_ai_model(AI_MODEL_NONE);
     object_camera_close();
     can_close();
     ipc_close();

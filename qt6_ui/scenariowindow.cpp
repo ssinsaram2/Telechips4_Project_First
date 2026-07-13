@@ -436,7 +436,7 @@ bool ScenarioWindow::loadTelegramConfig(QString *groupId, QString *apiToken) con
 
     for (const QString &path : candidates) {
         QFile file(path);
-        qInfo() << "[pin] trying Telegram config:" << path;
+        qInfo() << "[telegram] trying config:" << path;
         if (!file.open(QIODevice::ReadOnly | QIODevice::Text))
             continue;
 
@@ -466,16 +466,16 @@ bool ScenarioWindow::loadTelegramConfig(QString *groupId, QString *apiToken) con
                 *groupId = loadedGroupId;
             if (apiToken)
                 *apiToken = loadedApiToken;
-            qInfo() << "[pin] Telegram config loaded from" << path
+            qInfo() << "[telegram] config loaded from" << path
                     << "group_id_length=" << loadedGroupId.size()
                     << "token_length=" << loadedApiToken.size();
             return true;
         }
 
-        qWarning() << "[pin] Telegram config missing GROUP_ID or API_TOKEN in" << path;
+        qWarning() << "[telegram] config missing GROUP_ID or API_TOKEN in" << path;
     }
 
-    qWarning() << "[pin] Telegram config not found";
+    qWarning() << "[telegram] config not found";
     return false;
 }
 
