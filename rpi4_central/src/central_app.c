@@ -125,10 +125,10 @@
  * 의미 있는 범위만 허용한다. 범위를 벗어난 값은 fail-safe로 clamp한다.
  */
 #define DRIVER_PROFILE_JSON_MAX_BYTES 8192U
-#define DRIVER_PROFILE_DEFAULT_SEAT_POSITION 40U
+#define DRIVER_PROFILE_DEFAULT_SEAT_POSITION 1000U
 #define DRIVER_PROFILE_DEFAULT_TEMPERATURE_C 25U
 #define DRIVER_PROFILE_SEAT_MIN 0U
-#define DRIVER_PROFILE_SEAT_MAX 100U
+#define DRIVER_PROFILE_SEAT_MAX 5000U
 #define DRIVER_PROFILE_TEMPERATURE_MIN_C 16U
 #define DRIVER_PROFILE_TEMPERATURE_MAX_C 30U
 
@@ -144,7 +144,7 @@ typedef enum
 typedef struct
 {
     uint32_t driverId;
-    uint8_t seatPosition;
+    uint32_t seatPosition; /* 기준 위치에서 전진할 시간(ms) */
     uint8_t temperatureTarget;
 } DriverProfile;
 
@@ -519,7 +519,7 @@ static void send_ui(IpcMessageType type, int32_t d0, int32_t d1, int32_t d2, int
             perror("[central] mq_send UI");
         }
 
-        
+
     }
     else
     {
@@ -684,18 +684,39 @@ static void send_temperature_target(uint8_t tempC)
     (void)can_send(CAN_ID_TEMPERATURE_TARGET_VALUE, 4U, data);
 }
 
-static void send_seat_target(uint8_t duty)
+static void send_seat_home(void)
+{
+    uint8_t data[5];
+    const uint16_t durationMs = 5000U;
+
+    data[0] = 1U;       /* direction 1: 최대 전진하여 기준 위치 초기화 */
+    data[1] = 100U;     /* PWM duty */
+    data[2] = (uint8_t)(durationMs & 0xFFU);
+    data[3] = (uint8_t)((durationMs >> 8) & 0xFFU);
+    data[4] = 0x00U;
+
+    (void)can_send(CAN_ID_SEAT_TARGET_VALUE, 5U, data);
+}
+
+static void send_seat_target(uint32_t durationMs)
 {
     uint8_t data[5];
 
-    if (duty < 70U)
-        duty = 70U;
+    if (durationMs > DRIVER_PROFILE_SEAT_MAX)
+        durationMs = DRIVER_PROFILE_SEAT_MAX;
 
-    data[0] = 1U;       /* forward */
-    data[1] = duty;     /* PWM duty */
-    data[2] = 0xB8U;    /* 1000 ms little-endian */
-    data[3] = 0x0BU;
+    data[0] = 2U;       /* direction 2: 운전자 개인화 위치로 이동 */
+    data[1] = 100U;     /* PWM duty */
+    data[2] = (uint8_t)(durationMs & 0xFFU);
+    data[3] = (uint8_t)((durationMs >> 8) & 0xFFU);
     data[4] = 0x00U;
+    (void)can_send(CAN_ID_SEAT_TARGET_VALUE, 5U, data);
+}
+
+static void send_seat_stop(void)
+{
+    const uint8_t data[5] = {0U, 0U, 0U, 0U, 0U};
+
     (void)can_send(CAN_ID_SEAT_TARGET_VALUE, 5U, data);
 }
 
@@ -1154,8 +1175,8 @@ static bool parse_json_u32_field(const char *begin, const char *end,
     return true;
 }
 
-static uint8_t clamp_profile_value(const char *field, uint32_t value,
-                                   uint32_t minValue, uint32_t maxValue)
+static uint32_t clamp_profile_value(const char *field, uint32_t value,
+                                    uint32_t minValue, uint32_t maxValue)
 {
     uint32_t clamped = value;
 
@@ -1172,7 +1193,7 @@ static uint8_t clamp_profile_value(const char *field, uint32_t value,
         clamped = maxValue;
     }
 
-    return (uint8_t)clamped;
+    return clamped;
 }
 
 static bool parse_driver_profile_json(const char *json, uint32_t driverId,
@@ -1245,10 +1266,11 @@ static bool parse_driver_profile_json(const char *json, uint32_t driverId,
                                                         parsedSeatPosition,
                                                         DRIVER_PROFILE_SEAT_MIN,
                                                         DRIVER_PROFILE_SEAT_MAX);
-            profile->temperatureTarget = clamp_profile_value("temperature",
-                                                             parsedTemperature,
-                                                             DRIVER_PROFILE_TEMPERATURE_MIN_C,
-                                                             DRIVER_PROFILE_TEMPERATURE_MAX_C);
+            profile->temperatureTarget = (uint8_t)clamp_profile_value(
+                                                            "temperature",
+                                                            parsedTemperature,
+                                                            DRIVER_PROFILE_TEMPERATURE_MIN_C,
+                                                            DRIVER_PROFILE_TEMPERATURE_MAX_C);
             return true;
         }
 
@@ -1356,7 +1378,7 @@ static void set_default_profile(uint32_t driverId)
      * JSON 파일이 없거나 해당 driverId가 없으면 인증은 유지하되,
      * 액츄에이터에는 안전한 기본값을 보낸다.
      */
-    g_profile.driverId = driverId == 0U ? 1U : driverId;
+    g_profile.driverId = driverId;
     g_profile.seatPosition = DRIVER_PROFILE_DEFAULT_SEAT_POSITION;
     g_profile.temperatureTarget = DRIVER_PROFILE_DEFAULT_TEMPERATURE_C;
     g_hasProfile = true;
@@ -1386,7 +1408,11 @@ static void apply_profile(void)
         return;
     }
 
+    send_ignition_operation(IGNITION_DISPLAY, OP_PARKING);
+    usleep(200 * 1000);
+
     send_temperature_target(g_profile.temperatureTarget);
+
     send_seat_target(g_profile.seatPosition);
     send_interior_light_auto();
     send_ui(IPC_MSG_PROFILE_APPLIED,
@@ -1405,7 +1431,7 @@ static void apply_profile(void)
 static void load_profile(uint32_t driverId)
 {
     DriverProfile loadedProfile;
-    uint32_t normalizedDriverId = driverId == 0U ? 1U : driverId;
+    uint32_t normalizedDriverId = driverId;
 
     if (load_profile_from_json(normalizedDriverId, &loadedProfile))
     {
@@ -1896,7 +1922,9 @@ static void enter_operational_from_wait(void)
     /* [MOD] 주행 상태: RPi5 AI 모델 미사용(0). */
     rpi5_send_ai_model(AI_MODEL_NONE);
     send_ignition_operation(IGNITION_ON, OP_RUNNING);
-    apply_profile();
+    send_seat_stop();
+    /* 개인화 좌석 명령은 얼굴/PIN 인증 성공 시 이미 한 번 전송했다.
+     * 시동 버튼에서는 정지 명령만 보내 액추에이터가 계속 움직이지 않게 한다. */
     send_ui(IPC_MSG_SHOW_OPERATION_SCREEN, 0, 0, 0, 0);
     send_seatbelt_ui();
 }
@@ -1945,6 +1973,10 @@ static void enter_ignition_off_from_drive(void)
     g_hasProfile = false;
     update_buzzer();
     send_ignition_operation(IGNITION_OFF, OP_PARKING);
+    // ===== 추가한 내용 =====
+    usleep(200 * 1000);
+    send_seat_home();
+    // =====================
     send_ui(IPC_MSG_SCREEN_OFF, 1, 0, 0, 0);
     start_child_monitoring();
 }
@@ -2011,7 +2043,8 @@ static void process_ipc_message(const IpcMessage *msg)
         case IPC_MSG_DRIVER_ID_RECEIVED:
             if (g_state == STATE_DRIVER_AUTH)
             {
-                enter_wait_ignition((uint32_t)msg->data[0], "pin");
+                /* 얼굴인식 실패 후 PIN 인증은 공용 0번 프로필을 사용한다. */
+                enter_wait_ignition(0U, "pin");
             }
             else
             {
@@ -2287,8 +2320,6 @@ static void process_object_camera_messages(void)
 
 int main(void)
 {
-
-
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
 
@@ -2311,7 +2342,12 @@ int main(void)
     printf("[central] school bus RPi4 central start (state=%s)\n", state_name(g_state));
 
     (void)ipc_init();
-    (void)can_init();
+    if (can_init())
+    {
+        send_ignition_operation(IGNITION_OFF, OP_PARKING);
+        usleep(200 * 1000);
+        send_seat_home();
+    }
     (void)object_camera_init();
 
     rpi5_send_ai_model(AI_MODEL_NONE);

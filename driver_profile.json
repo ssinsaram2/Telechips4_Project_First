@@ -1,6 +1,11 @@
 {
   "drivers": [
     {
+      "driverId": 0,
+      "seatPosition": 1000,
+      "temperature": 25
+    },
+    {
       "driverId": 1,
       "seatPosition": 1000,
       "temperature": 24
