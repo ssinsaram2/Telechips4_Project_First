@@ -177,10 +177,15 @@ static bool g_cameraDetected = false;
 
 /* [MOD] 잔류 감지 재무장(re-arm) 억제: 해제 직후 잠깐은 새 경고를 latch하지 않음 */
 /* [MOD] ACK cooldown: 확인 완료 후 이 시각까지는 새 경고를 latch하지 않는다.
- * 감시(monitoring)는 계속 살아 있으며, 유예 만료 후 감지가 지속/재발하면
- * 새 1차 경고가 발생한다. */
+ * 감시(monitoring)는 계속 살아 있지만, 같은 연속 감지는 재경고하지 않는다.
+ * cooldown 만료 후 모든 잔류 센서가 false로 내려간 것이 확인되어야 새 1차 경고를 허용한다. */
 static uint32_t g_childAckCooldownSec = CHILD_ACK_COOLDOWN_DEFAULT_SEC;
 static uint64_t g_childAckCooldownUntilSec = 0U;
+/* [MOD] ACK 후 같은 연속 감지로 재경고하지 않기 위한 재무장 상태.
+ * 버튼을 누른 뒤에는 cooldown 만료 + 모든 잔류 센서 false 관측이 둘 다 충족되어야
+ * 다음 1차 경고를 허용한다. */
+static bool g_childAckRearmPending = false;
+static bool g_childAckClearObserved = false;
 
 /* [MOD] 마지막으로 수신한 환경 센서값 캐시 (0x041) — 잔류 경보 시 판단 로그용 */
 static int16_t  g_lastTempX10 = 0;
@@ -720,9 +725,26 @@ static bool udp_send_text(const char *host, const char *port, const char *text)
 
 static void rpi5_send(const char *command)
 {
-    const char *host = getenv("RPI5_AI_HOST");
-    const char *port = getenv("RPI5_AI_CONTROL_PORT");
+    // const char *host = getenv("RPI5_AI_HOST");
+    // const char *port = getenv("RPI5_AI_CONTROL_PORT");
+    //
+    // if (port == NULL || port[0] == '\0')
+    // {
+    //     port = "5020";
+    // }
+    // if (host == NULL || host[0] == '\0')
+    // {
+    //     printf("[central] RPI5_AI_HOST unset; skip RPi5 command %s\n", command);
+    //     return;
+    // }
+    //
+    // printf("[central] RPi5 command: %s -> %s:%s\n", command, host, port);
+    // (void)udp_send_text(host, port, command);
 
+    const char *host = "192.168.111.111"; // 라파5의 실제 고정 IP
+    const char *port = "5020";             // 라파5 파이썬 코드가 열어둔 UDP 포트
+
+    // 주소와 포트가 무조건 존재하므로, 기존의 가드 클로즈(NULL 체크) 분기는 생략합니다.
     if (port == NULL || port[0] == '\0')
     {
         port = "5020";
@@ -734,6 +756,8 @@ static void rpi5_send(const char *command)
     }
 
     printf("[central] RPi5 command: %s -> %s:%s\n", command, host, port);
+
+    // 기존 최하위 UDP 전송 함수를 그대로 호출하여 패킷을 송신합니다.
     (void)udp_send_text(host, port, command);
 }
 
@@ -1000,6 +1024,8 @@ static void start_child_monitoring(void)
     g_pirDetected = false;
     g_cameraDetected = false;
     g_childAckCooldownUntilSec = 0U; /* [MOD] 새 세션은 이전 cooldown을 승계하지 않는다 */
+    g_childAckRearmPending = false;
+    g_childAckClearObserved = false;
     /* [MOD] 시동 OFF 후 잔류 아동 감시 상태: RPi5는 객체 감지 모델(2)을 사용한다. */
     rpi5_send_ai_model(AI_MODEL_OBJECT_ROA);
     printf("[central] residual child monitoring started\n");
@@ -1027,6 +1053,8 @@ static void stop_child_monitoring(void)
     g_childLevel2Sent = false;
     g_pirDetected = false;
     g_cameraDetected = false;
+    g_childAckRearmPending = false;
+    g_childAckClearObserved = false;
     /* [MOD] 잔류 감시 종료/주행 전환 시 RPi5 AI 모델을 끈다(0). */
     rpi5_send_ai_model(AI_MODEL_NONE);
     send_object_detected(false, 0U);
@@ -1154,6 +1182,8 @@ static void clear_child_alarm(void)
     g_pirDetected = false;
     g_cameraDetected = false;
     g_childAckCooldownUntilSec = monotonic_seconds() + g_childAckCooldownSec;
+    g_childAckRearmPending = true;
+    g_childAckClearObserved = false;
 
     if (g_state == STATE_IGNITION_OFF)
     {
@@ -1176,12 +1206,9 @@ static void clear_child_alarm(void)
 
 static void update_child_sensor(uint32_t source, bool detected)
 {
-    /* [보완] ACK 쿨다운 구간(Muting Window)에는 외부 센서 신호 유입을 완벽히 차단하여
-    * 확인자가 내리는 움직임으로 인해 내부 캐시 변수가 다시 true로 오염되는 것을 방지합니다. */
-    if (g_childMonitoringActive && (monotonic_seconds() < g_childAckCooldownUntilSec))
-    {
-        return;
-    }
+    uint64_t now = monotonic_seconds();
+    bool residualDetected;
+    bool ackHoldActive;
 
     if (source == CHILD_SENSOR_CAMERA)
     {
@@ -1190,7 +1217,6 @@ static void update_child_sensor(uint32_t source, bool detected)
             printf("[central] AI object detected=%d\n", detected ? 1 : 0);
         }
         g_cameraDetected = detected;
-        send_object_detected(detected, detected ? 100U : 0U);
     }
     else
     {
@@ -1203,10 +1229,54 @@ static void update_child_sensor(uint32_t source, bool detected)
 
     if (!g_childMonitoringActive)
     {
+        if (source == CHILD_SENSOR_CAMERA)
+        {
+            send_object_detected(detected, detected ? 100U : 0U);
+        }
         return;
     }
 
-    bool residualDetected = g_pirDetected || g_cameraDetected;
+    residualDetected = g_pirDetected || g_cameraDetected;
+    ackHoldActive = (now < g_childAckCooldownUntilSec) || g_childAckRearmPending;
+
+    if (source == CHILD_SENSOR_CAMERA && !ackHoldActive)
+    {
+        send_object_detected(detected, detected ? 100U : 0U);
+    }
+
+    /*
+     * [MOD] ACK 후 재무장 조건.
+     * 버튼 ACK 직후 같은 PIR/카메라 HIGH가 계속 들어오는 상황을 새 사건으로 보지 않는다.
+     * 다음 1차 경고는 (1) cooldown 만료, (2) PIR/카메라가 모두 false였던 순간 관측 후에만 허용한다.
+     */
+    if (g_childAckRearmPending)
+    {
+        if (!residualDetected)
+        {
+            g_childAckClearObserved = true;
+        }
+
+        if (now < g_childAckCooldownUntilSec || !g_childAckClearObserved)
+        {
+            return;
+        }
+
+        g_childAckRearmPending = false;
+        g_childAckCooldownUntilSec = 0U;
+        g_childAckClearObserved = false;
+        printf("[central] child monitoring re-armed after ACK cooldown and sensor clear\n");
+        fflush(stdout);
+
+        if (!residualDetected)
+        {
+            return;
+        }
+    }
+
+    if (now < g_childAckCooldownUntilSec)
+    {
+        return;
+    }
 
     if (residualDetected)
     {
@@ -1243,21 +1313,25 @@ static void central_tick(void)
         start_child_alarm_level2("timeout without UI clear");
     }
 
-    /* [보완] 3. 쿨다운 만료 시 상시 잔류 검증 (Timer Polling)
-     * 쿨다운이 방금 종료되었는데, 아동이 여전히 잔류하여 하드웨어 센서 신호가 HIGH(1) 상태를
-     * 계속 유지하고 있다면, 새 이벤트 유입을 기다리지 않고 타이머 루프에서 즉시 재경보를 발령합니다. */
-    if (g_childMonitoringActive && !g_childAlarmLatched &&
-        g_childAckCooldownUntilSec != 0U && now >= g_childAckCooldownUntilSec)
+    /*
+     * [MOD] ACK cooldown 만료 처리.
+     * 기존 로직처럼 센서가 계속 HIGH인 상태에서 즉시 새 1차 경고를 띄우지 않는다.
+     * cooldown 중/후에 PIR과 카메라가 모두 false였던 순간이 확인된 경우에만 재무장한다.
+     */
+    if (g_childMonitoringActive &&
+        !g_childAlarmLatched &&
+        g_childAckRearmPending &&
+        g_childAckClearObserved &&
+        g_childAckCooldownUntilSec != 0U &&
+        now >= g_childAckCooldownUntilSec &&
+        !g_pirDetected &&
+        !g_cameraDetected)
     {
-        g_childAckCooldownUntilSec = 0U; // 쿨다운 플래그 리셋
-
-        // 외부 장치(라즈베리파이5/CAN 보드)로부터 상시 전송되는 물리 센서의 마지막 상태 체크
-        if (g_pirDetected || g_cameraDetected)
-        {
-            printf("[central] Cooldown expired but child still present. Re-latching alarm!\n");
-            fflush(stdout);
-            start_child_alarm_level1(g_pirDetected ? CHILD_SENSOR_PIR : CHILD_SENSOR_CAMERA);
-        }
+        g_childAckRearmPending = false;
+        g_childAckCooldownUntilSec = 0U;
+        g_childAckClearObserved = false;
+        printf("[central] child monitoring re-armed after ACK cooldown\n");
+        fflush(stdout);
     }
 }
 
@@ -1676,10 +1750,18 @@ static void process_object_camera_messages(void)
 
 int main(void)
 {
-    rpi5_send_ai_model(5);
+
 
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
+
+    while (1)
+    {
+        printf("========================\n");
+        printf("\n\n [TCP] TCP CONNECTED\n");
+        printf("========================\n");
+        rpi5_send_ai_model(1);
+    }
 
     /* [MOD] 중복 실행 방지 (요구사항 12-1) */
     if (!pid_file_acquire())
