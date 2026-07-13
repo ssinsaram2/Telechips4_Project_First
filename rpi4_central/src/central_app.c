@@ -725,24 +725,8 @@ static bool udp_send_text(const char *host, const char *port, const char *text)
 
 static void rpi5_send(const char *command)
 {
-    // const char *host = getenv("RPI5_AI_HOST");
-    // const char *port = getenv("RPI5_AI_CONTROL_PORT");
-    //
-    // if (port == NULL || port[0] == '\0')
-    // {
-    //     port = "5020";
-    // }
-    // if (host == NULL || host[0] == '\0')
-    // {
-    //     printf("[central] RPI5_AI_HOST unset; skip RPi5 command %s\n", command);
-    //     return;
-    // }
-    //
-    // printf("[central] RPi5 command: %s -> %s:%s\n", command, host, port);
-    // (void)udp_send_text(host, port, command);
-
-    const char *host = "192.168.111.111"; // 라파5의 실제 고정 IP
-    const char *port = "5020";             // 라파5 파이썬 코드가 열어둔 UDP 포트
+    const char *host = "192.168.111.111";  // rpi5의 실제 고정 IP
+    const char *port = "5020";             // rpi5 파이썬 코드가 열어둔 UDP 포트
 
     // 주소와 포트가 무조건 존재하므로, 기존의 가드 클로즈(NULL 체크) 분기는 생략합니다.
     if (port == NULL || port[0] == '\0')
@@ -795,7 +779,7 @@ static void rpi5_send_ai_model(uint8_t model)
 static bool object_camera_init(void)
 {
     struct sockaddr_in addr;
-    uint16_t port = (uint16_t)env_u32("OBJECT_CAMERA_PORT", 5010U);
+    uint16_t port = (uint16_t)env_u32("OBJECT_CAMERA_PORT", 5000U);
     int reuse = 1;
 
     g_objectCameraSocket = socket(AF_INET, SOCK_DGRAM, 0);
@@ -1754,14 +1738,6 @@ int main(void)
 
     signal(SIGINT, handle_signal);
     signal(SIGTERM, handle_signal);
-
-    while (1)
-    {
-        printf("========================\n");
-        printf("\n\n [TCP] TCP CONNECTED\n");
-        printf("========================\n");
-        rpi5_send_ai_model(1);
-    }
 
     /* [MOD] 중복 실행 방지 (요구사항 12-1) */
     if (!pid_file_acquire())

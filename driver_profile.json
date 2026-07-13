@@ -1,0 +1,19 @@
+{
+  "drivers": [
+    {
+      "driverId": 1,
+      "seatPosition": 10,
+      "temperature": 24
+    },
+    {
+      "driverId": 2,
+      "seatPosition": 20,
+      "temperature": 22
+    },
+    {
+      "driverId": 3,
+      "seatPosition": 15,
+      "temperature": 26
+    }
+  ]
+}

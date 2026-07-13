@@ -284,9 +284,6 @@ void CentralClient::readFaceResultDatagrams()
         if (driverId > 0) {
             emit faceResultReceived(driverId);
             sendFaceSuccess(driverId);
-        } else {
-            emit faceResultFailed();
-            sendFaceFail();
         }
     }
 }
