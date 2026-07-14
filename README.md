@@ -43,6 +43,26 @@ RPi4 Central이 시스템 상태를 판단하는 중심 프로세스입니다. C
     `-- reset_ipc.sh
 ```
 
+## 하드웨어/네트워크 구성
+
+| 구성 요소 | 역할 | 연결/프로토콜 |
+| --- | --- | --- |
+| Raspberry Pi 4 | Central 제어기, Qt6 UI 실행 | SocketCAN, POSIX mqueue, UDP |
+| RTOS 보드 | 전원 버튼, PIR, 안전벨트, 부저/LED/창문 제어 | CAN 500 kbit/s |
+| F/W 보드 | 환경/미세먼지 센서, 좌석/공조/내부등 제어 | CAN 500 kbit/s |
+| Raspberry Pi 5 | 얼굴 인증 및 잔류 아동 객체 감지 AI | UDP |
+| Telegram Bot API | PIN, 1차/2차 경고 알림 | HTTPS |
+
+기본 네트워크 포트:
+
+| 포트 | 수신 주체 | 용도 |
+| --- | --- | --- |
+| UDP 5000 | Qt UI | RPi5 얼굴 인증 결과 수신 |
+| UDP 5010 | RPi4 Central | RPi5 객체 감지 결과 수신 |
+| UDP 5020 | RPi5 | Central의 AI 모델 선택 명령 수신 |
+
+현재 Central의 RPi5 제어 대상은 `192.168.111.111:5020`으로 코드에 고정되어 있습니다. 변경이 필요하면 `rpi4_central/src/central_app.c`의 `rpi5_send()`를 수정한 뒤 재빌드합니다.
+
 ## 동작 흐름
 
 ### 1. 전원, 인증, 시동
@@ -224,13 +244,14 @@ export UI_APP_PATH=/opt/central/school_bus_ui
 export DRIVER_PROFILE_PATH=/opt/central/driver_profile.json
 export TELEGRAM_CONFIG=/opt/central/telegram.txt
 export POLICE_TELEGRAM_CONFIG=/opt/central/police.txt
-export CHILD_ALERT_LEVEL1_CMD="/opt/central/send_child_alert_telegram.sh driver"
 export CHILD_ALERT_LEVEL2_CMD="/opt/central/send_child_alert_telegram.sh police"
 export CHILD_ALERT_ESCALATION_SEC=30
 export CHILD_ACK_COOLDOWN_SEC=30
 
 sudo -E scripts/start_system.sh
 ```
+
+1차 운전자 Telegram 알림은 UI가 `telegram.txt`로 전송합니다. Central 경로로 1차 알림을 별도 전송하려면 `CHILD_ALERT_LEVEL1_CMD="/opt/central/send_child_alert_telegram.sh driver"`를 추가할 수 있지만, UI 알림과 중복될 수 있습니다.
 
 `start_system.sh`는 다음 순서로 실행합니다.
 
@@ -275,6 +296,67 @@ scripts/clean_runtime.sh
 ```
 
 `clean_runtime.sh`는 프로세스를 종료하고 POSIX message queue와 PID 파일을 정리합니다.
+
+### 자동 실행(systemd) 예시
+
+운영 장비에서 부팅 후 자동 실행이 필요하면 systemd unit으로 분리해 등록할 수 있습니다. 아래 예시는 `/opt/central`에 배포가 끝났고, RPi 데스크톱 세션에서 Qt UI를 띄우는 구성을 가정합니다. 사용자명, 디스플레이 서버, 설정 파일 경로는 장비에 맞게 조정해야 합니다.
+
+Central 서비스 예시:
+
+```ini
+[Unit]
+Description=School Bus RPi4 Central
+After=network-online.target
+Wants=network-online.target
+
+[Service]
+Type=simple
+ExecStartPre=/opt/central/can_setup.sh
+ExecStart=/opt/central/central_app
+WorkingDirectory=/opt/central
+Environment=DRIVER_PROFILE_PATH=/opt/central/driver_profile.json
+Environment=TELEGRAM_CONFIG=/opt/central/telegram.txt
+Environment=POLICE_TELEGRAM_CONFIG=/opt/central/police.txt
+Environment="CHILD_ALERT_LEVEL2_CMD=/opt/central/send_child_alert_telegram.sh police"
+Restart=on-failure
+
+[Install]
+WantedBy=multi-user.target
+```
+
+Qt UI 서비스 예시:
+
+```ini
+[Unit]
+Description=School Bus Qt6 UI
+After=graphical.target school-bus-central.service
+Requires=school-bus-central.service
+
+[Service]
+Type=simple
+User=pi
+WorkingDirectory=/opt/central
+Environment=DISPLAY=:0
+Environment=UI_START_CENTRAL=0
+ExecStart=/opt/central/school_bus_ui
+Restart=on-failure
+
+[Install]
+WantedBy=graphical.target
+```
+
+등록 예시:
+
+```sh
+sudo install -m 0755 scripts/can_setup.sh /opt/central/can_setup.sh
+sudo systemctl daemon-reload
+sudo systemctl enable school-bus-central.service
+sudo systemctl enable school-bus-ui.service
+sudo systemctl start school-bus-central.service
+sudo systemctl start school-bus-ui.service
+```
+
+Qt UI가 화면을 열지 못하면 `DISPLAY`, `XAUTHORITY`, `QT_QPA_PLATFORM` 설정과 데스크톱 자동 로그인 상태를 먼저 확인합니다.
 
 ## RPi5 AI 연동
 
@@ -483,6 +565,96 @@ export CHILD_ALERT_ESCALATION_SEC=5
 sudo -E scripts/start_system.sh
 ```
 
+## 시연 절차
+
+아래 절차는 실제 장비 시연에서 전체 기능을 한 번에 확인하는 순서입니다. 시작 전 `central_app`, `school_bus_ui`, `can0`, Telegram 설정, RPi5 UDP 서버가 준비되어 있어야 합니다.
+
+### A. 전원 및 운전자 인증
+
+1. 시스템 시작 후 UI가 검은 화면인지 확인합니다.
+2. 전원 버튼 입력을 보냅니다.
+
+```sh
+cansend can0 012#01
+cansend can0 012#00
+```
+
+3. UI가 얼굴 인증 화면으로 전환되고, RPi5 로그에서 AI 모델 `1` 수신을 확인합니다.
+4. 얼굴 인증 성공을 시뮬레이션합니다.
+
+```sh
+python3 rpi4_central/scripts/send_face_result.py <RPi4_IP> 1
+```
+
+5. UI가 운전자 인증 완료/시동 대기 화면으로 바뀌고, Central 로그에 프로파일 적용 로그가 출력되는지 확인합니다.
+6. 전원 버튼을 다시 입력합니다.
+
+```sh
+cansend can0 012#01
+cansend can0 012#00
+```
+
+7. UI가 주행 화면으로 전환되고 Central이 `0x083 [0x02, 0x01]`을 송신하는지 확인합니다.
+
+### B. 승하차 및 안전벨트 경고
+
+1. UI의 `승하차` 버튼을 눌러 승하차 모드로 전환합니다.
+2. 1번, 2번 좌석 안전벨트 체결을 보냅니다.
+
+```sh
+cansend can0 032#0101
+```
+
+3. 두 좌석이 파란색으로 표시되는지 확인합니다.
+4. UI의 `승하차` 버튼을 다시 눌러 주행 모드로 복귀합니다. 이때 현재 체결 좌석이 기준 좌석으로 저장됩니다.
+5. 2번 좌석 벨트 해제를 보냅니다.
+
+```sh
+cansend can0 032#0100
+```
+
+6. 2번 좌석이 빨간색으로 바뀌고 부저 `0x0C3` ON 명령이 나가는지 확인합니다.
+7. 다시 체결합니다.
+
+```sh
+cansend can0 032#0101
+```
+
+8. 빨간 경고가 해제되고 부저가 OFF 되는지 확인합니다.
+
+### C. 잔류 아동 감지
+
+1. 주행 상태에서 전원 버튼을 입력해 시동 OFF/잔류감지 상태로 전환합니다.
+
+```sh
+cansend can0 012#01
+cansend can0 012#00
+```
+
+2. UI에 `잔류감지 모드로 전환` 문구가 잠시 표시되고 검은 화면으로 돌아가는지 확인합니다.
+3. RPi5 로그에서 AI 모델 `2` 수신을 확인합니다.
+4. PIR 또는 객체 감지 이벤트를 발생시킵니다.
+
+```sh
+cansend can0 022#01
+```
+
+또는:
+
+```sh
+python3 rpi4_central/scripts/send_object_camera_event.py <RPi4_IP> 1
+```
+
+5. UI 경고 화면, 운전자 Telegram 1차 알림, 부저/외부 LED/창문 명령을 확인합니다.
+6. `CHILD_ALERT_ESCALATION_SEC`가 지난 뒤 경찰 Telegram 2차 알림이 1회만 전송되는지 확인합니다.
+7. UI의 `차량 확인 완료` 버튼을 누르거나 다음 CAN을 보냅니다.
+
+```sh
+cansend can0 022#02
+```
+
+8. 경고 화면이 꺼지고 부저/외부 LED/창문 명령이 해제되는지 확인합니다. 잔류 감시는 계속 유지됩니다.
+
 ## 주요 환경변수
 
 | 변수 | 기본값 | 설명 |
@@ -556,6 +728,16 @@ export CAN_DEBUG_LOG=1
 - 현재 Central의 RPi5 대상은 `central_app.c`의 `rpi5_send()`에 있는 `192.168.111.111:5020`입니다.
 - RPi5 수신 서버가 문자열 명령이 아니라 `0`, `1`, `2` 숫자 payload를 처리하는지 확인합니다.
 - IP/포트를 바꾸려면 `rpi5_send()`를 수정한 뒤 재빌드합니다.
+
+## Known Limitations
+
+- 안전벨트 경고 판단은 현재 1번, 2번 좌석만 활성입니다. UI는 8좌석을 표시하지만 Central의 `ACTIVE_SEAT_MASK`는 `0x03`입니다.
+- RPi5 제어 대상 IP/포트는 환경변수가 아니라 `central_app.c`의 `rpi5_send()`에 하드코딩되어 있습니다.
+- 얼굴 인증 결과 UDP에서 `FAIL`, `UNKNOWN`, `0`은 성공으로 처리되지 않지만 즉시 실패 화면을 강제하지는 않습니다. PIN 대체 인증은 얼굴 인증 화면의 10초 타임아웃 후 진입합니다.
+- PIN 인증 성공은 현재 공용 driverId `0` 프로파일을 사용합니다.
+- Telegram 1차 알림은 UI와 Central 양쪽 경로가 모두 존재합니다. 운용 시 중복 알림 정책이 필요하면 `CHILD_ALERT_LEVEL1_CMD` 사용 여부와 UI의 `telegram.txt` 설정을 함께 점검해야 합니다.
+- `police.txt`가 git 추적 대상에 포함되어 있습니다. 실제 Bot token 또는 chat id가 들어 있다면 저장소 이력에서 제거하고 토큰을 재발급하는 것이 안전합니다.
+- systemd UI 자동 실행은 디스플레이 서버 설정에 영향을 받습니다. 장비가 X11이 아닌 Wayland를 쓰거나 자동 로그인이 꺼져 있으면 unit 예시를 그대로 사용할 수 없습니다.
 
 ## 개발 메모
 
