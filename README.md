@@ -1,32 +1,57 @@
-🚀 Raspberry Pi 5 Central Control AI System
-라즈베리파이 5(RPi5)에서 구동되는 멀티 스레드 기반 중앙 제어 AI 시스템입니다.
+# 🚀 Raspberry Pi 5 Central Control AI System
+
+라즈베리파이 5(RPi5)에서 구동되는 **멀티 스레드 기반 중앙 제어 AI 시스템**입니다. 
 
 본 시스템은 라즈베리파이 4(RPi4)로부터 UDP 명령을 수신하여 실시간으로 동작 모드를 전환하며, 카메라 스트림을 분할하여 인공지능 분석(얼굴 인식, 객체 감지)과 RTSP 스트리밍을 동시에 처리하는 에지 디바이스(Edge Device) 파이프라인을 구축합니다.
 
-🗺️ 1. System Architecture (시스템 아키텍처)
-전체 시스템은 [입력 및 스트림 분할] ➡️ [중앙 모드 제어] ➡️ [AI 추론 및 결과 전송]의 구조를 가집니다. 단일 웹캠 소스를 논리적으로 복제하여 자원 충돌을 방지하고, 독립적인 멀티스레드로 각 역할을 수행합니다.
+---
 
-             ┌──────────────────────┐
-             │   라즈베리파이 4      │
-             └──────────┬───────────┘
-                        │ (UDP 5020: Control Command 0, 1, 2)
-                        ▼
-┌────────────────────────────────────────────────────────────────────────┐
-│ 라즈베리파이 5 (Ubuntu Desktop 22.04 LTS)                              │
-│                                                                        │
-│  [Hardware Camera] -> /dev/video0                                      │
-│                           │ (v4l2loopback & ffmpeg 복제)                │
-│                           ├──> /dev/video10 (RTSP Stream Source)       │
-│                           └──> /dev/video11 (AI Main Python - cv2)     │
-│                                                                        │
-│  [Network Thread] ──────────────────────────┐                          │
-│     └─ UDP Listener (Port 5020)              │                          │
-│                                              ▼ Mode Switch (0, 1, 2)    │
-│  [Main Inference Thread] ───────────► [Central Control]                │
-│     ├─ Mode 0: AI Disabled (Bypass)                                    │
-│     ├─ Mode 1: InsightFace ──────────► RPi4 IP:5000 (SJH=1, SHG=2)     │
-│     └─ Mode 2: YOLOv8n (NCNN) ───────► RPi4 IP:5010 (Detect=1, None=0) │
-└────────────────────────────────────────────────────────────────────────┘
+## 🗺️ 1. System Architecture (시스템 아키텍처)
+
+전체 시스템은 **[입력 및 스트림 분할] ➡️ [중앙 모드 제어] ➡️ [AI 추론 및 결과 전송]**의 구조를 가집니다. 단일 웹캠 소스를 논리적으로 복제하여 자원 충돌을 방지하고, 독립적인 멀티스레드로 각 역할을 수행합니다.
+
+### 📊 시스템 데이터 흐름도 (Mermaid)
+> 💡 GitHub나 VS Code 등 Mermaid를 지원하는 환경에서 깔끔한 그래픽 다이어그램으로 자동 변환됩니다.
+
+```mermaid
+graph TD
+    %% 라즈베리파이 4 영역
+    subgraph RPi4 [Raspberry Pi 4]
+        CMD[UDP Control Command]
+        RECV1[UDP Port 5000 SJH/SHG]
+        RECV2[UDP Port 5010 Detect 1/0]
+    end
+
+    %% 라즈베리파이 5 영역
+    subgraph RPi5 [Raspberry Pi 5 Ubuntu 22.04]
+        CAM[Hardware Camera /dev/video0]
+        
+        %% Stream Demux
+        subgraph Demux [V4L2 Loopback & FFmpeg Demux]
+            V10[/dev/video10: RTSP Channel]
+            V11[/dev/video11: AI Channel]
+        end
+
+        %% Threading
+        NET_TH[Network Thread: UDP 5020]
+        CTRL[Central Control & Mode Lock]
+        AI_TH[Main Inference Thread]
+    end
+
+    %% 연결 관계
+    CAM -->|ffmpeg| V10
+    CAM -->|ffmpeg| V11
+    
+    V10 -->|GStreamer| RTSP[RTSP Client Sink]
+    V11 -->|OpenCV| AI_TH
+
+    CMD -->|Port 5020| NET_TH
+    NET_TH -->|Mode Switch 0, 1, 2| CTRL
+    CTRL -->|Thread-safe Control| AI_TH
+
+    %% AI 모드 분기 및 전송
+    AI_TH -->|Mode 1: InsightFace| RECV1
+    AI_TH -->|Mode 2: YOLOv8n NCNN| RECV2
 🔄 데이터 흐름 및 상태 제어 시나리오
 명령 수신: main.py 내 network_receiver_thread가 UDP 5020 포트를 상시 리스닝하며 대기합니다.
 
