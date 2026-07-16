@@ -1,14 +1,14 @@
 # 어린이 통학차량 안전관리 시스템
 
-Qt6 UI, Raspberry Pi 4 Central, RTOS/F/W CAN 노드, Raspberry Pi 5 AI 모듈을 연동하는 어린이 통학차량 안전관리 시스템 최종본입니다.
+Qt6 UI, Raspberry Pi 4 Central, RTOS/F/W CAN 노드, Raspberry Pi 5 AI 모듈을 연동하는 어린이 통학차량 안전관리 시스템 UI 및 코드 통합본입니다.
 
 RPi4 Central이 시스템 상태를 판단하는 중심 프로세스입니다. Central은 SocketCAN으로 RTOS/F/W와 통신하고, POSIX message queue로 Qt6 UI를 제어하며, UDP로 RPi5 AI 모델 선택과 객체 감지 결과를 주고받습니다.
 
 ## 주요 기능
 
-- 전원 버튼 기반 상태 전환: OFF -> 운전자 인증 -> 시동 대기 -> 주행 -> 시동 OFF/잔류감지
+- 전원 버튼 기반 상태 전환: OFF -> 운전자 인증 -> 시동 대기 -> 주행 -> 시동 OFF/잔류 감지
 - 운전자 얼굴 인증 및 PIN 대체 인증
-- 운전자별 좌석/온도 개인화 프로파일 적용
+- 운전자별 좌석/온도 개인화 프로필 적용
 - 승하차 모드와 주행 모드의 안전벨트 표시/경고 분리
 - PIR 센서와 RPi5 객체 감지 기반 잔류 아동 감지
 - 1차 운전자 알림, 2차 경찰 알림 Telegram 전송
@@ -70,18 +70,18 @@ RPi4 Central이 시스템 상태를 판단하는 중심 프로세스입니다. C
 1. 초기 상태는 검은 화면입니다. Central은 `0x083 [0x00, 0x00]`을 송신해 시동 OFF/주차 상태를 알립니다.
 2. RTOS 전원 버튼 CAN `0x012`의 rising edge가 들어오면 Central은 운전자 인증 상태로 전환합니다.
 3. Central은 Qt UI에 `IPC_MSG_SHOW_AUTH_SCREEN`을 보내고 RPi5에 AI 모델 `1`을 UDP로 전송합니다.
-4. Qt UI는 얼굴 인증 결과를 UDP 5000번 포트에서 수신합니다. 양수 driverId payload는 등록 운전자 인증 성공으로 처리됩니다.
+4. Qt UI는 얼굴 인증 결과를 UDP 5000번 포트에서 수신합니다. driverId payload는 등록 운전자 인증 성공으로 처리됩니다.
 5. 얼굴 인증 성공 시 UI는 `IPC_MSG_FACE_AUTH_SUCCESS`와 driverId를 Central로 보냅니다.
 6. 얼굴 인증 화면에서 10초 동안 성공 결과가 없으면 PIN 입력 버튼이 표시됩니다. PIN은 Telegram으로 전송되는 6자리 코드이며, 3회 실패하면 인증 차단 화면으로 전환됩니다.
-7. PIN 인증 성공 시 Central은 공용 driverId `0` 프로파일을 사용합니다.
+7. PIN 인증 성공 시 Central은 공용 driverId `0` 프로필을 사용합니다.
 8. 인증 성공 후 Central은 `driver_profile.json`에서 운전자 프로파일을 읽고 좌석/온도 CAN 명령을 보낸 뒤 UI를 시동 대기 화면으로 전환합니다.
 9. 전원 버튼 `0x012`가 다시 입력되면 Central은 주행 상태로 전환하고 `0x083 [0x02, 0x01]`을 송신합니다.
 
-주의: 현재 UI의 얼굴 결과 UDP 처리에서는 `FAIL`, `UNKNOWN`, `0` payload를 인증 성공으로 처리하지 않지만, 즉시 실패 이벤트를 발생시키지는 않습니다. PIN 진입은 10초 타임아웃 후 화면의 PIN 입력 버튼으로 진행됩니다.
+주의: 현재 UI의 얼굴 결과 UDP 처리에서는 `FAIL`, `UNKNOWN`, `0` payload를 인증 성공으로 처리하지 않지만, 즉시 실패 이벤트를 발생시키지는 않습니다. PIN 진입은 10초 초과 후 화면의 PIN 입력 버튼으로 진행됩니다.
 
 ### 2. 승하차와 안전벨트
 
-현재 Central의 안전벨트 판단 활성 좌석은 1번과 2번입니다. UI는 8개 좌석을 표시하지만 CAN 입력으로 실제 갱신되는 좌석은 `0x032 data[0]`, `data[1]`입니다.
+현재 Central의 안전벨트 판단 활성 좌석은 1번과 2번입니다. UI는 8개 좌석을 표시하지만 CAN 입력으로 실제 갱신되는 좌석은 1번 좌석과 2번 좌석으로 CAN ID는 `0x032 data[0]`, `data[1]`입니다.
 
 1. 주행 화면 진입 직후 좌석은 모두 회색입니다.
 2. UI의 `승하차` 버튼을 누르면 Central은 `STATE_PASSENGER_TRANSFER`로 전환하고 `0x083 [0x02, 0x04]`를 송신합니다.
@@ -112,10 +112,10 @@ RPi4 Central이 시스템 상태를 판단하는 중심 프로세스입니다. C
 
 ### 요구 환경
 
-- Linux 또는 Raspberry Pi OS 계열
+- Linux 또는 Raspberry Pi OS 계열 (프로젝트에서는 Yocto Scarthgap을 사용하였습니다.)
 - CMake 3.16 이상
 - C/C++ 컴파일러
-- Qt6 Core, Network, Widgets
+- Qt6 Core, Network, Widgets (Version 6.9.3)
 - POSIX message queue 지원
 - SocketCAN 및 `can-utils`
 - Telegram 전송용 `curl`
@@ -186,7 +186,6 @@ driver_profile.json
 - `seatPosition`: 좌석 이동 시간(ms), 허용 범위 0~5000
 - `temperature`: 목표 실내 온도, 허용 범위 16~30
 - 프로파일 파일이 없거나 매칭 실패 시 기본값은 seatPosition `1000`, temperature `25`
-- PIN 인증은 공용 driverId `0` 프로파일 사용
 
 ### Telegram
 
@@ -206,7 +205,7 @@ CHAT_ID='<police_or_group_chat_id>'
 API_TOKEN='<telegram_bot_token>'
 ```
 
-환경변수로도 설정할 수 있습니다.
+환경 변수로도 설정할 수 있습니다. 하지만 위의 방법을 권장합니다.
 
 ```sh
 export TELEGRAM_BOT_TOKEN='<telegram_bot_token>'
@@ -488,7 +487,7 @@ python3 rpi4_central/scripts/send_face_result.py <RPi4_IP> 1
 
 PIN 대체 인증은 얼굴 인증 화면에서 10초 대기 후 PIN 입력 버튼으로 진입합니다.
 
-### 안전벨트
+### 안전 벨트
 
 1번, 2번 좌석 체결:
 
@@ -620,18 +619,18 @@ cansend can0 032#0100
 cansend can0 032#0101
 ```
 
-8. 빨간 경고가 해제되고 부저가 OFF 되는지 확인합니다.
+8. 경고가 해제되고 부저가 OFF 되는지 확인합니다.
 
 ### C. 잔류 아동 감지
 
-1. 주행 상태에서 전원 버튼을 입력해 시동 OFF/잔류감지 상태로 전환합니다.
+1. 주행 상태에서 전원 버튼을 입력해 시동 OFF/잔류 감지 상태로 전환합니다.
 
 ```sh
 cansend can0 012#01
 cansend can0 012#00
 ```
 
-2. UI에 `잔류감지 모드로 전환` 문구가 잠시 표시되고 검은 화면으로 돌아가는지 확인합니다.
+2. UI에 `잔류 감지 모드로 전환` 문구가 잠시 표시되고 검은 화면으로 돌아가는지 확인합니다.
 3. RPi5 로그에서 AI 모델 `2` 수신을 확인합니다.
 4. PIR 또는 객체 감지 이벤트를 발생시킵니다.
 
@@ -729,7 +728,7 @@ export CAN_DEBUG_LOG=1
 - RPi5 수신 서버가 문자열 명령이 아니라 `0`, `1`, `2` 숫자 payload를 처리하는지 확인합니다.
 - IP/포트를 바꾸려면 `rpi5_send()`를 수정한 뒤 재빌드합니다.
 
-## Known Limitations
+## 제약 사항
 
 - 안전벨트 경고 판단은 현재 1번, 2번 좌석만 활성입니다. UI는 8좌석을 표시하지만 Central의 `ACTIVE_SEAT_MASK`는 `0x03`입니다.
 - RPi5 제어 대상 IP/포트는 환경변수가 아니라 `central_app.c`의 `rpi5_send()`에 하드코딩되어 있습니다.
