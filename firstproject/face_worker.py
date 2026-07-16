@@ -61,11 +61,12 @@ class FaceWorker:
                 label = f"{best_name} ({best_sim:.2f})"
                 
                 cmd_mapping = {
-                    "SJH": "1\n",
-                    "SHG": "2\n"
+                    "ISY": "1\n",
+                    "IJW": "2\n"
+                    #"0": "SHG\nSJH\nHHJ\n"
                 }
 
-                command = cmd_mapping.get(best_name, "1\n")
+                command = cmd_mapping.get(best_name, "0\n")
 
                 # 라즈베리파이 전송
                 if self.client_socket is not None:
