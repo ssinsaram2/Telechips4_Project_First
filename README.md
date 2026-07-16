@@ -47,7 +47,7 @@
 
 - 우분투 데스크톱 22.04로 빌드
     
-    !ubuntu.png
+    <img width="852" height="596" alt="image" src="https://github.com/user-attachments/assets/8af9b4cb-5eb5-4bb2-a150-1434200c8ed6" />
     
     - 한글 세팅, 마우스 세팅 등이 라즈비안보다 편함
 
@@ -81,12 +81,11 @@
 
 - 웹캠 연결 확인
     
-    <img width="852" height="596" alt="image" src="https://github.com/user-attachments/assets/8af9b4cb-5eb5-4bb2-a150-1434200c8ed6" />
-
+    <img width="688" height="273" alt="image" src="https://github.com/user-attachments/assets/adfd7f5d-f103-479c-8198-038e1de81a35" />
     
 - 비디오 디바이스 파일 확인
     
-    !image.png
+    <img width="688" height="273" alt="image" src="https://github.com/user-attachments/assets/e7c3d9f2-a719-4e2c-b0ca-0adb3034c7c5" />
     
 - `v4l-utils` 를 이용해서 디바이스 파일 찾기
     
@@ -95,7 +94,7 @@
     v4l2-ctl --list-devices
     ```
     
-    !image.png
+    <img width="354" height="119" alt="image" src="https://github.com/user-attachments/assets/eb94e456-5472-41f0-84ed-979afd308848" />
     
 - 확인
     
@@ -194,104 +193,11 @@
 
 ### 인식 딜레이 테스트
 
-!image.png
+<img width="654" height="588" alt="image" src="https://github.com/user-attachments/assets/eee14c49-add9-4cea-87f2-0265069e00b0" />
 
 - 대략 0.3~0.6 초 정도의 인식 딜레이를 가짐
 
 ### 실행
-
-- face_worker.py
-    
-    ```python
-    import os
-    import cv2
-    import numpy as np
-    import socket
-    from insightface.app import FaceAnalysis
-    
-    class FaceWorker:
-        def __init__(self, rpi_ip="192.168.111.112", rpi_port=5000):
-            # 1. 네트워크 및 모델 초기화
-            self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            try:
-                self.client_socket.connect((rpi_ip, rpi_port))
-                print(f"[Face] 라파4({rpi_ip}:{rpi_port}) 연결 성공")
-            except Exception as e:
-                print(f"[Face 네트워크 에러] 로컬로만 실행합니다: {e}")
-                self.client_socket = None
-    
-            self.app = FaceAnalysis(
-                name='buffalo_l',
-                allowed_modules=['detection', 'recognition'],
-                providers=['CPUExecutionProvider']
-            )
-            self.app.prepare(ctx_id=0, det_size=(320, 320))
-            
-            self.registered = {}
-            self.sim_threshold = 0.45
-            self._load_database()
-    
-        def _load_database(self):
-            FACE_DIR = "faces"
-            if os.path.isdir(FACE_DIR):
-                for fname in os.listdir(FACE_DIR):
-                    if not fname.lower().endswith(('.jpg', '.jpeg', '.png')):
-                        continue
-                    name = os.path.splitext(fname)[0]
-                    img = cv2.imread(os.path.join(FACE_DIR, fname))
-                    if img is None: continue
-                    found = self.app.get(img)
-                    if found:
-                        self.registered[name] = found[0].normed_embedding
-                        print(f"[Face 등록] {name}")
-            
-            if not self.registered:
-                print("[Face 경고] 등록된 얼굴이 없습니다. faces/ 폴더를 확인하세요.")
-    
-        def process_frame(self, frame):
-            """메인에서 프레임을 받아 얼굴 인식을 수행하고 원본 프레임에 시각화합니다."""
-            faces = self.app.get(frame)
-            for face in faces:
-                x1, y1, x2, y2 = face.bbox.astype(int)
-                emb = face.normed_embedding
-    
-                best_name, best_sim = None, -1.0
-                for name, ref_emb in self.registered.items():
-                    sim = float(np.dot(ref_emb, emb))
-                    if sim > best_sim:
-                        best_name, best_sim = name, sim
-    
-                if best_sim > self.sim_threshold:
-                    color = (0, 255, 0)
-                    label = f"{best_name} ({best_sim:.2f})"
-                    
-                    cmd_mapping = {
-                        "SJH": "1\n",
-                        "SHG": "2\n"
-                    }
-    
-                    command = cmd_mapping.get(best_name, "1\n")
-    
-                    # 라즈베리파이 전송
-                    if self.client_socket is not None:
-                        try:
-                            #self.client_socket.sendto("1\n".encode('utf-8'), self.client_socket.getpeername())
-                            self.client_socket.sendto(command.encode('utf-8'), self.client_socket.getpeername())
-                            print(f"[Face 전송] {best_name} -> {command.strip()}") # 전송 로그 확인용
-                        except Exception:
-                            pass
-                else:
-                    color = (0, 0, 255)
-                    label = f"Unknown ({best_sim:.2f})"
-    
-                cv2.rectangle(frame, (x1, y1), (x2, y2), color, 2)
-                cv2.putText(frame, label, (x1, y1 - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.5, color, 2)
-            return frame
-    
-        def close(self):
-            if self.client_socket:
-                self.client_socket.close()
-    ```
     
 - 식별된 사람을 1, 2, 3의 형태의 데이터로 라즈베리파이4의 프토 5000번으로 전송
 
@@ -305,21 +211,10 @@
 
 - 파이썬 설치
 - yolov8n을 ncnn으로 만들기
-    - 코드
-        
-        ```python
-        from ultralytics import YOLO
-        
-        # 1. 기본 Nano 모델 로드 (인터넷에서 자동으로 다운로드됩니다)
-        model = YOLO("yolov8n.pt") 
-        
-        # 2. 라즈베리파이 최적화 포맷인 NCNN으로 변환
-        model.export(format="ncnn")
-        ```
         
 - yolov8n_ncnn_model 파일이 생성
     
-    !image.png
+    <img width="1408" height="740" alt="image" src="https://github.com/user-attachments/assets/57aa4365-ddcb-475a-9250-729df46a1bcc" />
     
 - 라파5로 옮기기
 
@@ -338,98 +233,24 @@
 - 테스트
     - 신체 부위도 사람으로 인식
         
-        !image.png
+        <img width="647" height="527" alt="image" src="https://github.com/user-attachments/assets/cde8cf95-4db4-4f5c-8643-5b2a3f314d4c" />
         
     - 인원 수 체크는 너무 변수가 많음
         
-        !image.png
+        <img width="1475" height="614" alt="image" src="https://github.com/user-attachments/assets/f88a1310-e166-4ca6-8eb0-08e0bea9606a" />
         
         - 손도 개별 객체로 판단해버림
     - 팔꿈치까지 다 보이면 하나로 인식
         
-        !image.png
+        <img width="1475" height="614" alt="image" src="https://github.com/user-attachments/assets/89870b5a-6768-4cd8-9d24-aaf6bd8b8347" />
         
 
 #### 딜레이 측정
 
-!image.png
+<img width="1513" height="574" alt="image" src="https://github.com/user-attachments/assets/e69789ad-209d-4b66-865c-0b4a61e36fea" />
 
 - 0.15~0.3 초
 
 ### 실행
-
-- yolo_worker.py
-    
-    ```python
-    import cv2
-    import socket
-    from ultralytics import YOLO
-    
-    class YoloWorker:
-        def __init__(self, model_path="yolov8n_ncnn_model", rpi_ip="192.168.111.112", rpi_port=5010):
-            # 1. YOLO 모델 로드
-            self.model = YOLO(model_path)
-            print("[YOLO] NCNN 경량화 모델 로드 완료")
-            
-            # 2. [추가] 라즈베리파이4 송신용 UDP 소켓 설정
-            self.client_socket = socket.socket(socket.AF_INET, socket.SOCK_DGRAM)
-            self.rpi_address = (rpi_ip, rpi_port)
-            
-            try:
-                self.client_socket.connect(self.rpi_address)
-                print(f"[YOLO] 라파4({rpi_ip}:{rpi_port}) 데이터 연결 성공")
-            except Exception as e:
-                print(f"[YOLO 네트워크 에러] 연결 실패 (로컬로만 실행): {e}")
-                self.client_socket = None
-                
-            # 3. [추가] 상태 추적용 변수 (None, 0: 없음, 1: 있음)
-            self.last_state = None 
-    
-        def process_frame(self, frame):
-            """메인에서 프레임을 받아 객체 추론을 수행하고 이더넷 신호를 송신합니다."""
-            results = self.model(frame, classes=0, verbose=False)
-            person_count = 0
-            
-            if len(results) > 0:
-                r = results[0]
-                person_count = len(r.boxes)
-                
-                # 화면 드로잉 (바운딩 박스)
-                for box in r.boxes:
-                    x1, y1, x2, y2 = map(int, box.xyxy[0].tolist())
-                    conf = float(box.conf[0])
-                    cv2.rectangle(frame, (x1, y1), (x2, y2), (255, 0, 0), 2)
-                    cv2.putText(frame, f"Person: {conf:.2f}", (x1, y1 - 10),
-                                cv2.FONT_HERSHEY_SIMPLEX, 0.5, (255, 0, 0), 2)
-                    
-            # 좌측 상단에 인원 수 표시
-            cv2.putText(frame, f"Count: {person_count}", (10, 30), 
-                        cv2.FONT_HERSHEY_SIMPLEX, 1.0, (0, 255, 255), 2)
-            
-            # ============================================================
-            # [신규 추가] 사람이 감지 여부에 따른 이더넷 (UDP) 데이터 송신
-            # ============================================================
-            current_state = 1 if person_count > 0 else 0
-            
-            # 상태가 변했을 때만 패킷을 전송하여 네트워크 부하 최적화 (Edge Trigger)
-            if current_state != self.last_state:
-                if self.client_socket is not None:
-                    try:
-                        send_msg = f"{current_state}\n".encode('utf-8')
-                        self.client_socket.sendto(send_msg, self.rpi_address)
-                        print(f"[YOLO 네트워크] 상태 변경 전송 -> {current_state}")
-                    except Exception as e:
-                        print(f"[YOLO 전송 실패] 데이터 유실 발생: {e}")
-                
-                # 현재 상태를 과거 상태로 갱신
-                self.last_state = current_state
-                
-            return frame
-    
-        def close(self):
-            """자원 해제"""
-            if self.client_socket:
-                self.client_socket.close()
-    ```
     
 - 사람이 있으면 1, 없으면 0을 라즈베리파이4의 포트 5010번으로 전송
